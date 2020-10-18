@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Encoder {
     private DcMotorEx motorPort;
-    private int ticksPerRev = 11000000;
-    private double reduction = 11000000;
-    private double conversionFactor = 11000000;
+    private int ticksPerRev;
+    private double reduction;
+    private double conversionFactor;
 
     /**
      * @param motorObject      DcMotorEx object pointed at the same motor port as the encoder is plugged into.

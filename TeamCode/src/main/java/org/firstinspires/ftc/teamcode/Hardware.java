@@ -19,7 +19,7 @@ public class Hardware {
     public Encoder right;
     public Encoder center;
 
-    public final static double odometerToMM = (1 / 8192d) * (37.3 * Math.PI) ;
+    public final static double odometerToMM = (1 / 8192d) * (38d * Math.PI);
 
     public OdometryGlobalTracking odometry;
 

@@ -43,13 +43,16 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
+        //TODO: Migrate this to it's own thread.
         robot.odometry.run();
 
         // Send telemetry message to signify robot running;
         telemetry.addData("Theta", robot.odometry.getRobotThetaRad());
-        telemetry.addData("left", robot.left.getDistance());
-        telemetry.addData("right", robot.right.getDistance());
-        telemetry.addData("center", robot.center.getDistance());
+        telemetry.addData("X", robot.odometry.getRobotX());
+        telemetry.addData("Y", robot.odometry.getRobotY());
+        telemetry.addData("Left", robot.left.getDistance());
+        telemetry.addData("Right", robot.right.getDistance());
+        telemetry.addData("Center", robot.center.getDistance());
         telemetry.addData("Conversion", robot.odometerToMM);
     }
 
