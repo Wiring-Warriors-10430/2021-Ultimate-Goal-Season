@@ -10,6 +10,7 @@ public class Encoder {
     private int ticksPerRev;
     private double reduction;
     private double conversionFactor;
+    private int reverse = 1;
 
     /**
      * @param motorObject      DcMotorEx object pointed at the same motor port as the encoder is plugged into.
@@ -45,12 +46,48 @@ public class Encoder {
 
         motorPort.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorPort.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
 
-        //new Encoder(motorObject, ticksPerRev, reduction, cf);
+    public Encoder(DcMotorEx motorObject, int ticksPerRev, double reduction, double conversionFactor, boolean reverse) {
+        motorPort = motorObject;
+        this.ticksPerRev = ticksPerRev;
+        this.reduction = reduction;
+        this.conversionFactor = conversionFactor;
+
+        if (reverse) {
+            this.reverse = -1;
+        }
+
+        motorPort.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorPort.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public Encoder(DcMotorEx motorObject, int ticksPerRev, double reduction, ConversionFactor conversionFactor, boolean reverse) {
+        double cf;
+
+        if (conversionFactor == ConversionFactor.DEGREE) {
+            cf = (double) 1/360;
+        } else if (conversionFactor == ConversionFactor.RADIAN) {
+            cf = (double) 1 / (2 * Math.PI);
+        } else {
+            cf = (double) 1/ticksPerRev;
+        }
+
+        motorPort = motorObject;
+        this.ticksPerRev = ticksPerRev;
+        this.reduction = reduction;
+        this.conversionFactor = cf;
+
+        if (reverse) {
+            this.reverse = -1;
+        }
+
+        motorPort.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorPort.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public int getRawTicks() {
-        return motorPort.getCurrentPosition();
+        return reverse*motorPort.getCurrentPosition();
     }
 
     public double getTicks() {

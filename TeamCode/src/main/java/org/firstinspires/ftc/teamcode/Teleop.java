@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Pushbot: Teleop Tank", group="Pushbot")
+@TeleOp(name="Odometry Test", group="Odometry")
 public class Teleop extends OpMode {
     Hardware robot = new Hardware();
 
@@ -43,13 +43,10 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        //TODO: Migrate this to it's own thread.
-        robot.odometry.run();
-
         // Send telemetry message to signify robot running;
-        telemetry.addData("Theta", robot.odometry.getRobotThetaRad());
-        telemetry.addData("X", robot.odometry.getRobotX());
-        telemetry.addData("Y", robot.odometry.getRobotY());
+        telemetry.addData("Theta", robot.odometry.getHeadingTheta());
+        telemetry.addData("X", robot.odometry.getX());
+        telemetry.addData("Y", robot.odometry.getY());
         telemetry.addData("Left", robot.left.getDistance());
         telemetry.addData("Right", robot.right.getDistance());
         telemetry.addData("Center", robot.center.getDistance());
