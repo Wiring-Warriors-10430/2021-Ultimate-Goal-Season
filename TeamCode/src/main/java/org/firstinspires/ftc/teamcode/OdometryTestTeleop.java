@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="Odometry Test", group="Odometry")
-public class Teleop extends OpMode {
+public class OdometryTestTeleop extends OpMode {
     Hardware robot = new Hardware();
 
     /*
