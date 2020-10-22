@@ -126,12 +126,13 @@ public class ProtoTypeBotTeleop extends OpMode{
         }
 
         // Use gamepad buttons to move the arm up (Y) and down (A)
-        if (gamepad1.b)
+        if (gamepad1.b) {
             robot.intake.setPower(-.5);
-        else if (gamepad1.a)
+        } else if (gamepad1.a) {
             robot.intake.setPower(.5);
-        else
-            robot.shooter.setPower(0.0);
+        } else {
+            robot.intake.setPower(0.0);
+        }
 
         // Send telemetry message to signify robot running;
         telemetry.addData("Shooter",  "Velocity = %.2f", robot.shooter.getVelocity());
