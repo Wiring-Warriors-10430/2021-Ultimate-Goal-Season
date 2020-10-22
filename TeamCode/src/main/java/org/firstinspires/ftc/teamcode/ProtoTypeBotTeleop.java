@@ -136,8 +136,16 @@ public class ProtoTypeBotTeleop extends OpMode{
 
         // Send telemetry message to signify robot running;
         telemetry.addData("Shooter",  "Velocity = %.2f", robot.shooter.getVelocity());
-        telemetry.addData("Left",  "%.2f", left);
-        telemetry.addData("Right", "%.2f", right);
+        telemetry.addData("       ", "Power = %.2f", robot.shooter.getPower());
+        telemetry.addData("Intake", "Power = %.2f", robot.intake.getPower());
+        telemetry.addData("Drive Power",  "Left = %.2f", left);
+        telemetry.addData("           ", "Right = %.2f", right);
+        telemetry.addData("Gamepad", "Left = %.2f", -gamepad1.left_stick_y);
+        telemetry.addData("       ", "Right = %.2f", -gamepad1.right_stick_y);
+        telemetry.addData("       ", "A = %s", gamepad1.a);
+        telemetry.addData("       ", "B = %s", gamepad1.b);
+        telemetry.addData("       ", "X = %s", gamepad1.x);
+        telemetry.addData("       ", "Shooting = %s", shooting);
     }
 
     /*
