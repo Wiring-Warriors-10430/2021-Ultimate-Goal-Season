@@ -94,6 +94,7 @@ public class Hardware {
         shooterLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        shooterLift.setTargetPosition(0);
         shooterLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -118,7 +119,6 @@ public class Hardware {
         frontLeftDrive.setPower(0);
         frontRightDrive.setPower(0);
 
-        shooterLift.setTargetPosition(0);
         shooterLift.setPower(0);
         shooter.setVelocity(0);
 
