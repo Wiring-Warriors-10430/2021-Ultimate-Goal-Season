@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 @TeleOp(name="Odometry Test", group="Odometry")
 public class Teleop extends OpMode {
     Hardware robot = new Hardware();
@@ -54,6 +57,7 @@ public class Teleop extends OpMode {
 
     private void verboseOutput() {
         // Send Odometry info
+        telemetry.addLine("Odometry:");
         telemetry.addData("Theta", robot.odometry.getHeadingTheta());
         telemetry.addData("X", robot.odometry.getX());
         telemetry.addData("Y", robot.odometry.getY());
@@ -61,5 +65,48 @@ public class Teleop extends OpMode {
         telemetry.addData("Right", robot.right.getDistance());
         telemetry.addData("Center", robot.center.getDistance());
         telemetry.addData("Conversion", robot.odometerToMM);
+        telemetry.addLine("");
+
+        // Send Motor info
+        telemetry.addLine("Motors:");
+        telemetry.addData("rearLeftDrive power", robot.rearLeftDrive.getPower());
+        telemetry.addData("rearLeftDrive port", robot.rearLeftDrive.getPortNumber());
+        telemetry.addData("rearRightDrive power", robot.rearRightDrive.getPower());
+        telemetry.addData("rearRightDrive port", robot.rearRightDrive.getPortNumber());
+        telemetry.addData("frontLeftDrive power", robot.frontLeftDrive.getPower());
+        telemetry.addData("frontLeftDrive port", robot.frontLeftDrive.getPortNumber());
+        telemetry.addData("frontRightDrive power", robot.frontRightDrive.getPower());
+        telemetry.addData("frontRightDrive port", robot.frontRightDrive.getPortNumber());
+        telemetry.addData("shooterLift power", robot.shooterLift.getPower());
+        telemetry.addData("shooterLift position", robot.shooterLift.getCurrentPosition());
+        telemetry.addData("shooterLift target position", robot.shooterLift.getTargetPosition());
+        telemetry.addData("shooterLift port", robot.shooterLift.getPortNumber());
+        telemetry.addData("shooter power", robot.shooter.getPower());
+        telemetry.addData("shooter degrees/time", robot.shooter.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("shooter port", robot.shooter.getPortNumber());
+        telemetry.addLine("");
+
+        // Send Servo info
+        telemetry.addLine("Servos:");
+        telemetry.addData("intake power", robot.intake.getPower());
+        telemetry.addData("intake port", robot.intake.getPortNumber());
+        telemetry.addData("feeder power", robot.feeder.getPower());
+        telemetry.addData("feeder port", robot.feeder.getPortNumber());
+        telemetry.addData("wobbleLeft power", robot.wobbleLeft.getPower());
+        telemetry.addData("wobbleLeft port", robot.wobbleLeft.getPortNumber());
+        telemetry.addData("wobbleRight power", robot.wobbleRight.getPower());
+        telemetry.addData("wobbleRight port", robot.wobbleRight.getPortNumber());
+        telemetry.addData("pusher position", robot.pusher.getPosition());
+        telemetry.addData("pusher port", robot.pusher.getPortNumber());
+        telemetry.addData("indexer position", robot.indexer.getPosition());
+        telemetry.addData("indexer port", robot.indexer.getPortNumber());
+        telemetry.addData("sounderArm position", robot.sounderArm.getPosition());
+        telemetry.addData("sounderArm port", robot.sounderArm.getPortNumber());
+        telemetry.addLine("");
+
+        // Send Sensor info
+        telemetry.addLine("Sensors:");
+        telemetry.addData("sounder distance mm", robot.sounder.getDistance(DistanceUnit.MM));
+        telemetry.addLine("");
     }
 }

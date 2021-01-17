@@ -151,9 +151,11 @@ public class Hardware {
         pusher.setDirection(Servo.Direction.FORWARD);
         sounderArm.setDirection(Servo.Direction.FORWARD);
 
-        indexer.setPosition(.5);
+        // .2 - .8 because linear servo, .2 - .6 because mechanics
+        indexer.setPosition(.2);
         pusher.setPosition(.5);
-        sounderArm.setPosition(.5);
+        // .2 - .8 because linear servo
+        sounderArm.setPosition(.2);
 
         /**
          *    Init Sensors
