@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.lib;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
