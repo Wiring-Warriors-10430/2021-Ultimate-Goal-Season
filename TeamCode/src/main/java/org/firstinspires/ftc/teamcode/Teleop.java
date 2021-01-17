@@ -40,14 +40,9 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        // Send telemetry message to signify robot running;
-        telemetry.addData("Theta", robot.odometry.getHeadingTheta());
-        telemetry.addData("X", robot.odometry.getX());
-        telemetry.addData("Y", robot.odometry.getY());
-        telemetry.addData("Left", robot.left.getDistance());
-        telemetry.addData("Right", robot.right.getDistance());
-        telemetry.addData("Center", robot.center.getDistance());
-        telemetry.addData("Conversion", robot.odometerToMM);
+        if (robot.verbose) {
+            verboseOutput();
+        }
     }
 
     /*
@@ -55,5 +50,16 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
+    }
+
+    private void verboseOutput() {
+        // Send Odometry info
+        telemetry.addData("Theta", robot.odometry.getHeadingTheta());
+        telemetry.addData("X", robot.odometry.getX());
+        telemetry.addData("Y", robot.odometry.getY());
+        telemetry.addData("Left", robot.left.getDistance());
+        telemetry.addData("Right", robot.right.getDistance());
+        telemetry.addData("Center", robot.center.getDistance());
+        telemetry.addData("Conversion", robot.odometerToMM);
     }
 }
