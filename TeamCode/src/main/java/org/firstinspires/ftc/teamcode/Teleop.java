@@ -24,8 +24,8 @@ public class Teleop extends OpMode {
          */
         robot.init(hardwareMap);
 
-        leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT);
-        rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT);
+        leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
+        rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
@@ -50,6 +50,8 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
+        robot.drivetrain.drive(leftStick.getX(1), rightStick.getY(1), rightStick.getX(1));
+
         telemetry.addLine("leftStick:");
         telemetry.addData("X", rightStick.getRawX());
         telemetry.addData("Y", rightStick.getRawY());
