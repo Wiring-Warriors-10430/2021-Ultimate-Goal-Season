@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.lib;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import java.io.InvalidObjectException;
-
 public class Joystick {
     private Gamepad gamepad;
     private Stick side;
@@ -35,11 +33,7 @@ public class Joystick {
     }
 
     public Vector2 getRaw() {
-        if (side == Stick.LEFT) {
-            return new Vector2(gamepad.left_stick_x, gamepad.left_stick_y);
-        } else {
-            return new Vector2(gamepad.right_stick_x, gamepad.right_stick_y);
-        }
+        return new Vector2(getRawX(), getRawY());
     }
 
     public double getX() {
@@ -87,7 +81,6 @@ public class Joystick {
             // Y+ wall
         } else if (angle > PiOverFour && angle <= 3 * PiOverFour) {
             squared = new Vector2(point.x * (float) (1 / Math.sin(angle)), point.y * (float) (1 / Math.sin(angle)));
-            ;
             // X- wall
         } else if (angle > 3 * PiOverFour && angle <= 5 * PiOverFour) {
             squared = new Vector2(point.x * (float)(-1 / Math.cos(angle)), point.y * (float)(1 / Math.sin(angle)));
@@ -98,8 +91,9 @@ public class Joystick {
             squared = Vector2.zero;
         }
         // Early-out for a perfect square output
-        if (innerRoundness == 0)
-        return squared;
+        if (innerRoundness == 0) {
+            return squared;
+        }
 
         // Find the inner-roundness scaling factor and LERP
         double length = point.Length();

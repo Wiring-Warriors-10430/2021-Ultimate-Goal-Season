@@ -5,10 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.lib.Joystick;
 
 @TeleOp(name="Odometry Test", group="Odometry")
 public class Teleop extends OpMode {
     Hardware robot = new Hardware();
+
+    Joystick leftStick;
+    Joystick rightStick;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -19,6 +23,9 @@ public class Teleop extends OpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+
+        leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT);
+        rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
@@ -43,6 +50,13 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
+        telemetry.addLine("leftStick:");
+        telemetry.addData("X", rightStick.getRawX());
+        telemetry.addData("Y", rightStick.getRawY());
+        telemetry.addLine("rightStick:");
+        telemetry.addData("X", rightStick.getX(0));
+        telemetry.addData("Y", rightStick.getY(0));
+
         if (robot.verbose) {
             verboseOutput();
         }
