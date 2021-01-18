@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.lib.Encoder;
+import org.firstinspires.ftc.teamcode.lib.MeccanumDrivetrain;
 import org.firstinspires.ftc.teamcode.lib.Odometry;
 
 import java.io.File;
@@ -27,6 +28,8 @@ public class Hardware {
     public Encoder center;
 
     public Odometry odometry;
+
+    public MeccanumDrivetrain drivetrain;
 
     public DcMotorEx shooterLift;
     public DcMotorEx shooter;
@@ -121,6 +124,9 @@ public class Hardware {
 
         shooterLift.setPower(0);
         shooter.setVelocity(0);
+
+        // Drivetrain class
+        drivetrain = new MeccanumDrivetrain(rearLeftDrive, rearRightDrive,frontLeftDrive, frontRightDrive, odometry);
 
         /**
          *    Init Servos
