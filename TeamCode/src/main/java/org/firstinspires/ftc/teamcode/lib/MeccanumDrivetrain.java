@@ -9,11 +9,23 @@ public class MeccanumDrivetrain {
     private DcMotorEx frontLeftDrive;
     private DcMotorEx frontRightDrive;
 
-    public MeccanumDrivetrain(DcMotorEx rearLeftDrive, DcMotorEx rearRightDrive, DcMotorEx frontLeftDrive, DcMotorEx frontRightDrive) {
+    private Odometry odometry;
+
+    private PIDFController xPID = new PIDFController(1,0,0,0);
+    private PIDFController yPID = new PIDFController(1,0,0,0);
+    private PIDFController thetaPID = new PIDFController(1,0,0,0);
+
+    private int goalX = 0;
+    private int goalY = 0;
+    private int goalHeading = 0;
+
+    public MeccanumDrivetrain(DcMotorEx rearLeftDrive, DcMotorEx rearRightDrive, DcMotorEx frontLeftDrive, DcMotorEx frontRightDrive, Odometry odometry) {
           this.rearLeftDrive = rearLeftDrive;
           this.rearRightDrive = rearRightDrive;
           this.frontLeftDrive = frontLeftDrive;
           this.frontRightDrive = frontRightDrive;
+
+          this.odometry = odometry;
     }
 
     public void drive(double x, double y, double theta) {
@@ -50,5 +62,23 @@ public class MeccanumDrivetrain {
         rearRightDrive.setPower(rearRightPow);
         frontLeftDrive.setPower(frontLeftPow);
         frontRightDrive.setPower(frontRightPow);
+    }
+
+    public void updateAutoDrive() {
+        double xOutput = xPID.run(odometry.getX());
+        double yOutput = yPID.run(odometry.getY());
+        double headingOutput = thetaPID.run(odometry.getHeadingTheta());
+
+        drive(xOutput, yOutput, headingOutput);
+    }
+
+    public void setGoal(int newX, int newY, int newHeading) {
+        xPID.setTarget(newX);
+        yPID.setTarget(newY);
+        thetaPID.setTarget(newHeading);
+
+        goalX = newX;
+        goalY = newY;
+        goalHeading = newHeading;
     }
 }
