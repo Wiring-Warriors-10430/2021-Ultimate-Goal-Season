@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 public class Joystick {
     private Gamepad gamepad;
     private Stick side;
+    private double pow;
 
     public enum Stick {
         LEFT,
@@ -14,21 +15,28 @@ public class Joystick {
     public Joystick(Gamepad pad, Stick stick) {
         gamepad = pad;
         side = stick;
+        pow = 1;
+    }
+
+    public Joystick(Gamepad pad, Stick stick, double power) {
+        gamepad = pad;
+        side = stick;
+        pow = power;
     }
 
     public double getRawX() {
         if (side == Stick.LEFT) {
-            return gamepad.left_stick_x;
+            return Math.pow(gamepad.left_stick_x, pow);
         } else {
-            return gamepad.right_stick_x;
+            return Math.pow(gamepad.right_stick_x, pow);
         }
     }
 
     public double getRawY() {
         if (side == Stick.LEFT) {
-            return gamepad.left_stick_y;
+            return Math.pow(gamepad.left_stick_y, pow);
         } else {
-            return gamepad.right_stick_y;
+            return Math.pow(gamepad.right_stick_y, pow);
         }
     }
 
