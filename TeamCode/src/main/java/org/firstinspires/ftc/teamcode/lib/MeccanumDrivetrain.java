@@ -10,10 +10,13 @@ public class MeccanumDrivetrain {
     private DcMotorEx frontRightDrive;
 
     public MeccanumDrivetrain(DcMotorEx rearLeftDrive, DcMotorEx rearRightDrive, DcMotorEx frontLeftDrive, DcMotorEx frontRightDrive) {
-
+          this.rearLeftDrive = rearLeftDrive;
+          this.rearRightDrive = rearRightDrive;
+          this.frontLeftDrive = frontLeftDrive;
+          this.frontRightDrive = frontRightDrive;
     }
 
-    public void Drive(double x, double y, double theta) {
+    public void drive(double x, double y, double theta) {
         double frontLeftPow = x + y + theta;
         double rearLeftPow = -x + y + theta;
         double frontRightPow = -x + y - theta;

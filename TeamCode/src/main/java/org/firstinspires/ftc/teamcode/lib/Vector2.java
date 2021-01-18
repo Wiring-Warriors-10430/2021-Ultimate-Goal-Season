@@ -11,15 +11,15 @@ public class Vector2 {
         this.y = y;
     }
 
-    public static Vector2 Lerp(Vector2 a, Vector2 b, double factor) {
-        return new Vector2(Lerp(a.x, b.x, factor), Lerp(a.y, b.y, factor));
+    public static Vector2 lerp(Vector2 a, Vector2 b, double factor) {
+        return new Vector2(lerp(a.x, b.x, factor), lerp(a.y, b.y, factor));
     }
 
-    public static double Lerp(double a, double b, double c) {
+    public static double lerp(double a, double b, double c) {
         return a + (b - a) * c;
     }
 
-    public double Length() {
+    public double length() {
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 }

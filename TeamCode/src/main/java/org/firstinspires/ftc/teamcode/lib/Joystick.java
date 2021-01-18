@@ -45,37 +45,37 @@ public class Joystick {
     }
 
     public double getX() {
-        return CircleToSquare(getRaw()).x;
+        return circleToSquare(getRaw()).x;
     }
 
     public double getY() {
-        return CircleToSquare(getRaw()).y;
+        return circleToSquare(getRaw()).y;
     }
 
     public Vector2 getVector2() {
-        return CircleToSquare(getRaw());
+        return circleToSquare(getRaw());
     }
 
     public double getX(double roundness) {
-        return CircleToSquare(getRaw(), roundness).x;
+        return circleToSquare(getRaw(), roundness).x;
     }
 
     public double getY(double roundness) {
-        return CircleToSquare(getRaw(), roundness).y;
+        return circleToSquare(getRaw(), roundness).y;
     }
 
     public Vector2 getVector2(double roundness) {
-        return CircleToSquare(getRaw(), roundness);
+        return circleToSquare(getRaw(), roundness);
     }
 
     /**
      *    Credit: Renaud Bédard http://theinstructionlimit.com/squaring-the-thumbsticks
      */
-    private static Vector2 CircleToSquare(Vector2 point) {
-        return CircleToSquare(point, 0);
+    private static Vector2 circleToSquare(Vector2 point) {
+        return circleToSquare(point, 0);
     }
 
-    private static Vector2 CircleToSquare(Vector2 point, double innerRoundness) {
+    private static Vector2 circleToSquare(Vector2 point, double innerRoundness) {
         final double PiOverFour = Math.PI / 4;
 
         // Determine the theta angle
@@ -104,9 +104,9 @@ public class Joystick {
         }
 
         // Find the inner-roundness scaling factor and LERP
-        double length = point.Length();
+        double length = point.length();
         double factor = (float) Math.pow(length, innerRoundness);
-        return Vector2.Lerp(point, squared, factor);
+        return Vector2.lerp(point, squared, factor);
     }
 
 }
