@@ -34,6 +34,7 @@ public class MeccanumDrivetrain {
         double frontRightPow = -x + y - theta;
         double rearRightPow = x + y - theta;
 
+        /**
         // Q1
         if (x >= 0 && y >= 0) {
             frontLeftPow = Range.scale(frontLeftPow, 0, 3, 0, 1);
@@ -48,15 +49,15 @@ public class MeccanumDrivetrain {
 
         // Q3
         if (x <= 0 && y <= 0) {
-            frontLeftPow = Range.scale(frontLeftPow, 0, -3, 0, 1);
-            rearRightPow = Range.scale(rearRightPow, 0, -2, 0, 1);
+            frontLeftPow = Range.scale(frontLeftPow, 0, -3, 0, -1);
+            rearRightPow = Range.scale(rearRightPow, 0, -2, 0, -1);
         }
 
         // Q4
         if (x >= 0 && y <= 0) {
-            rearLeftPow = Range.scale(rearLeftPow, 0, -2, 0, 1);
-            frontRightPow = Range.scale(frontRightPow, 0, -2, 0, 1);
-        }
+            rearLeftPow = Range.scale(rearLeftPow, 0, -2, 0, -1);
+            frontRightPow = Range.scale(frontRightPow, 0, -2, 0, -1);
+        } */
 
         rearLeftDrive.setPower(rearLeftPow);
         rearRightDrive.setPower(rearRightPow);

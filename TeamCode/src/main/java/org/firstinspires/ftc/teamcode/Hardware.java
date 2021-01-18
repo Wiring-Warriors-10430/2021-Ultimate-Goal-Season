@@ -55,7 +55,7 @@ public class Hardware {
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
-    public boolean verbose = false;
+    public boolean verbose = true;
 
     public Hardware () {/**empty constructor*/}
 

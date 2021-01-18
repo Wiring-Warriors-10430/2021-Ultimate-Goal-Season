@@ -25,18 +25,34 @@ public class Joystick {
     }
 
     public double getRawX() {
+        double value;
+
         if (side == Stick.LEFT) {
-            return Math.pow(gamepad.left_stick_x, pow);
+            value = gamepad.left_stick_x;
         } else {
-            return Math.pow(gamepad.right_stick_x, pow);
+            value = gamepad.right_stick_x;
+        }
+
+        if (value < 0 && pow % 2 == 0) {
+            return - Math.pow(value, pow);
+        } else {
+            return Math.pow(value, pow);
         }
     }
 
     public double getRawY() {
+        double value;
+
         if (side == Stick.LEFT) {
-            return Math.pow(gamepad.left_stick_y, pow);
+            value = - gamepad.left_stick_y;
         } else {
-            return Math.pow(gamepad.right_stick_y, pow);
+            value = - gamepad.right_stick_y;
+        }
+
+        if (value < 0 && pow % 2 == 0) {
+            return - Math.pow(value, pow);
+        } else {
+            return Math.pow(value, pow);
         }
     }
 
@@ -91,10 +107,10 @@ public class Joystick {
             squared = new Vector2(point.x * (float) (1 / Math.sin(angle)), point.y * (float) (1 / Math.sin(angle)));
             // X- wall
         } else if (angle > 3 * PiOverFour && angle <= 5 * PiOverFour) {
-            squared = new Vector2(point.x * (float)(-1 / Math.cos(angle)), point.y * (float)(1 / Math.sin(angle)));
+            squared = new Vector2(point.x * (float)(-1 / Math.cos(angle)), point.y * (float)(-1 / Math.cos(angle)));
         // Y- wall
         } else if (angle > 5 * PiOverFour && angle <= 7 * PiOverFour) {
-            squared = new Vector2(point.x * (float) (-1 / Math.sin(angle)), point.y * (float) (1 / Math.sin(angle)));
+            squared = new Vector2(point.x * (float) (-1 / Math.sin(angle)), point.y * (float) (-1 / Math.sin(angle)));
         } else {
             squared = Vector2.zero;
         }

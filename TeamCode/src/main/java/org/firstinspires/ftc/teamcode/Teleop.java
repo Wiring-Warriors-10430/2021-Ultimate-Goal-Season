@@ -50,14 +50,14 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        robot.drivetrain.drive(leftStick.getX(1), rightStick.getY(1), rightStick.getX(1));
+        robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1), rightStick.getX(1));
 
         telemetry.addLine("leftStick:");
-        telemetry.addData("X", rightStick.getRawX());
-        telemetry.addData("Y", rightStick.getRawY());
+        telemetry.addData("X", leftStick.getRawX());
+        telemetry.addData("Y", leftStick.getRawY());
         telemetry.addLine("rightStick:");
-        telemetry.addData("X", rightStick.getX(0));
-        telemetry.addData("Y", rightStick.getY(0));
+        telemetry.addData("X", leftStick.getX(1));
+        telemetry.addData("Y", leftStick.getY(1));
 
         if (robot.verbose) {
             verboseOutput();
