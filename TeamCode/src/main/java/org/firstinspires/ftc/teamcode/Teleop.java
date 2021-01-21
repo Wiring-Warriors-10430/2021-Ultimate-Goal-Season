@@ -30,6 +30,8 @@ public class Teleop extends OpMode {
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
 
+        robot.drivetrain.setGoal(500, 1000, Math.toRadians(90));
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
     }
@@ -53,7 +55,12 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        robot.drivetrain.drive(leftStick.getX(1), rightStick.getY(1), rightStick.getX(1));
+        robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
+                rightStick.getX(1));
+
+        if (gamepad1.a) {
+            robot.drivetrain.updateAutoDrive();
+        }
 
         if (robot.verbose) {
             verboseOutput();
@@ -68,14 +75,6 @@ public class Teleop extends OpMode {
     }
 
     private void verboseOutput() {
-        //Send Stick info
-        telemetry.addLine("leftStick:");
-        telemetry.addData("X", rightStick.getRawX());
-        telemetry.addData("Y", rightStick.getRawY());
-        telemetry.addLine("rightStick:");
-        telemetry.addData("X", rightStick.getX(0));
-        telemetry.addData("Y", rightStick.getY(0));
-
         // Send Odometry info
         telemetry.addLine("Odometry:");
         telemetry.addData("Theta", robot.odometry.getHeadingTheta());
@@ -86,6 +85,15 @@ public class Teleop extends OpMode {
         telemetry.addData("Center", robot.center.getDistance());
         telemetry.addData("Conversion", robot.odometerToMM);
         telemetry.addLine("");
+
+        // Send Joystick Info
+        telemetry.addLine("Sticks");
+        telemetry.addLine("leftStick:");
+        telemetry.addData("X", leftStick.getX(1));
+        telemetry.addData("Y", leftStick.getY(1));
+        telemetry.addLine("rightStick:");
+        telemetry.addData("X", rightStick.getX(1));
+        telemetry.addData("Y", rightStick.getY(1));
 
         // Send Motor info
         telemetry.addLine("Motors:");

@@ -13,44 +13,78 @@ public class PIDFController {
     private double previous_error = 0;
     private double integral = 0;
 
-    private int setpoint = 0;
+    private double setpoint = 0;
     private double lastTime = 0;
 
     private double output = 0;
 
+    private double tolerance;
+
+    private boolean running;
+
     private ElapsedTime time = new ElapsedTime();
 
-    public PIDFController(double kP, double kI, double kD, double kF) {
+    public PIDFController(double kP, double kI, double kD, double kF, double tolerance) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.kF = kF;
 
+        this.tolerance = tolerance;
+
         enabled = true;
     }
 
     public double run(double currentPosition) {
-        double dt = time.milliseconds() - lastTime;
+        if (enabled) {
+            if (!(setpoint - tolerance <= currentPosition && currentPosition <= setpoint + tolerance)) {
+                running = true;
 
-        double error = setpoint - currentPosition;
-        integral = integral + error * dt;
-        double derivative = (error - previous_error) / dt;
-        output = kP * error + kI * integral + kD * derivative;
-        previous_error = error;
-        lastTime = time.milliseconds();
+                double dt = time.milliseconds() - lastTime;
 
-        return output;
+                double error = setpoint - currentPosition;
+                integral = integral + error * dt;
+                double derivative = (error - previous_error) / dt;
+                output = kP * error + kI * integral + kD * derivative;
+                previous_error = error;
+                lastTime = time.milliseconds();
+
+                return output;
+            } else {
+                running = false;
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+
+    }
+
+    public void enable() {
+        enabled = true;
+    }
+
+    public void disable() {
+        enabled = false;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public double getOutput() {
         return output;
     }
 
-    public void setTarget(int ticks) {
+    public void setTarget(double ticks) {
         setpoint = ticks;
     }
 
-    public int getTarget() {
+    public double getTarget() {
         return setpoint;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }
