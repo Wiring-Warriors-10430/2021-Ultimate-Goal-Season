@@ -55,7 +55,7 @@ public class Hardware {
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
-    public boolean verbose = true;
+    public boolean verbose = false;
 
     public Hardware () {/**empty constructor*/}
 
@@ -78,8 +78,12 @@ public class Hardware {
 
         // Drivetrain
         left = new Encoder(rearLeftDrive, 8192, 1, odometerToMM, false);
-        right = new Encoder(rearRightDrive, 8192, 1, odometerToMM, true);
-        center = new Encoder(frontLeftDrive, 8192, 1, odometerToMM, false);
+        right = new Encoder(frontLeftDrive, 8192, 1, odometerToMM, false);
+        center = new Encoder(rearRightDrive, 8192, 1, odometerToMM, false);
+
+        left.reset();
+        right.reset();
+        center.reset();
 
         robotEncoderWheelDistance = Double.parseDouble(ReadWriteFile.readFile(wheelBaseSeparationFile).trim());
         this.horizontalEncoderTickPerDegreeOffset = Double.parseDouble(ReadWriteFile.readFile(horizontalTickOffsetFile).trim());

@@ -96,6 +96,12 @@ public class Encoder {
         return getTicks() * conversionFactor;
     }
 
+    public void reset() {
+        motorPort.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        motorPort.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public enum ConversionFactor {
         DEGREE,
         RADIAN,
