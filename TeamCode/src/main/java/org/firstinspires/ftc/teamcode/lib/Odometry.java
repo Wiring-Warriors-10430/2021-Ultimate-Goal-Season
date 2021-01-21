@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.lib;
 
+import com.qualcomm.robotcore.util.ReadWriteFile;
+
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+
+import java.io.File;
+
 public class Odometry {
     private OdometryGlobalTracking tracking;
 
@@ -11,6 +17,14 @@ public class Odometry {
     private double normalOffset;
 
     private Thread positionThread;
+
+    private double xOffset;
+    private double yOffset;
+    private double headingOffset;
+
+    private File offsetX = AppUtil.getInstance().getSettingsFile("offsetX.txt");
+    private File offsetY = AppUtil.getInstance().getSettingsFile("offsetY.txt");
+    private File offsetTheta = AppUtil.getInstance().getSettingsFile("offsetTheta.txt");
 
     public Odometry(Encoder left, Encoder right, Encoder normal, double trackWidth, double normalOffset, int updateTime) {
         this.left = left;
@@ -25,24 +39,60 @@ public class Odometry {
         positionThread = new Thread(tracking);
     }
 
+    public void setOffset(Pose2D initial) {
+        setOffset(initial.x, initial.y, initial.theta);
+    }
+
+    public void setOffset(double xOffset, double yOffset, double headingOffsetRad) {
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+        this.headingOffset = headingOffsetRad;
+    }
+
     public Pose2D getPos2D() {
         return new Pose2D(tracking.getRobotX(), tracking.getRobotY(), tracking.getRobotHeading());
     }
 
     public double getX() {
-        return tracking.getRobotX();
+        return tracking.getRobotX() + xOffset;
     }
 
     public double getY() {
-        return tracking.getRobotY();
+        return tracking.getRobotY() + yOffset;
     }
 
     public double getHeadingTheta() {
-        return tracking.getRobotHeading();
+        return tracking.getRobotHeading() + headingOffset;
     }
 
     public double getHeadingDeg() {
-        return Math.toDegrees(getHeadingTheta());
+        return Math.toDegrees(getHeadingTheta()) + Math.toDegrees(headingOffset);
+    }
+
+    public void writePoseToFile() {
+        ReadWriteFile.writeFile(offsetX, String.valueOf(getX()));
+        ReadWriteFile.writeFile(offsetY, String.valueOf(getY()));
+        ReadWriteFile.writeFile(offsetTheta, String.valueOf(getHeadingTheta()));
+    }
+
+    public Pose2D readPoseFromFile() {
+        return new Pose2D(readXFromFile(), readYFromFile(), readHeadingFromFile());
+    }
+
+    public double readXFromFile() {
+        return Double.valueOf(ReadWriteFile.readFile(offsetX).trim());
+    }
+
+    public double readYFromFile() {
+        return Double.valueOf(ReadWriteFile.readFile(offsetY).trim());
+    }
+
+    public double readHeadingFromFile() {
+        return Double.valueOf(ReadWriteFile.readFile(offsetTheta).trim());
+    }
+
+    public void setOffsetFromFile() {
+        setOffset(readPoseFromFile());
     }
 
     public void startTracking() {

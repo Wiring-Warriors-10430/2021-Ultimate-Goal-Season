@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.lib.Joystick;
+import org.firstinspires.ftc.teamcode.lib.Pose2D;
 
 @TeleOp(name="Odometry Test", group="Odometry")
 public class Teleop extends OpMode {
@@ -23,6 +24,8 @@ public class Teleop extends OpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+
+        robot.odometry.setOffsetFromFile();
 
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
@@ -52,13 +55,6 @@ public class Teleop extends OpMode {
     public void loop() {
         robot.drivetrain.drive(leftStick.getX(1), rightStick.getY(1), rightStick.getX(1));
 
-        telemetry.addLine("leftStick:");
-        telemetry.addData("X", rightStick.getRawX());
-        telemetry.addData("Y", rightStick.getRawY());
-        telemetry.addLine("rightStick:");
-        telemetry.addData("X", rightStick.getX(0));
-        telemetry.addData("Y", rightStick.getY(0));
-
         if (robot.verbose) {
             verboseOutput();
         }
@@ -72,6 +68,14 @@ public class Teleop extends OpMode {
     }
 
     private void verboseOutput() {
+        //Send Stick info
+        telemetry.addLine("leftStick:");
+        telemetry.addData("X", rightStick.getRawX());
+        telemetry.addData("Y", rightStick.getRawY());
+        telemetry.addLine("rightStick:");
+        telemetry.addData("X", rightStick.getX(0));
+        telemetry.addData("Y", rightStick.getY(0));
+
         // Send Odometry info
         telemetry.addLine("Odometry:");
         telemetry.addData("Theta", robot.odometry.getHeadingTheta());
