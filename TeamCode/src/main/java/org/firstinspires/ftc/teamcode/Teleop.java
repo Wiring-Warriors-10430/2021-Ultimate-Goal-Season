@@ -65,6 +65,8 @@ public class Teleop extends OpMode {
         if (robot.verbose) {
             verboseOutput();
         }
+
+        robot.odometry.writePoseToFile();
     }
 
     /*
@@ -72,6 +74,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
+        robot.odometry.setOffset(0, 0, 0);
     }
 
     private void verboseOutput() {

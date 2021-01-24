@@ -33,6 +33,12 @@ public class Hardware {
 
     public DcMotorEx shooterLift;
     public DcMotorEx shooter;
+    public DcMotorEx wobbleLift;
+    public DcMotorEx wobbleArm;
+
+    public Encoder shooterLiftEnc;
+    public Encoder wobbleLiftEnc;
+    public Encoder wobbleArmEnc;
 
     public CRServo intake;
     public CRServo feeder;
@@ -49,13 +55,18 @@ public class Hardware {
 
     public final static double odometerToMM = (1 / 8192d) * (38d * Math.PI);
 
+    public final static double shooterLiftToDeg = (360/2786);
+    public final static double wobbleLiftToMM = (1/383.6d) * (40d * Math.PI);
+    public final static double wobbleArmReduction = 1/24;
+    public final static double wobbleArmToDeg = (360/753.2) * wobbleArmReduction;
+
     private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation.txt");
     private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset.txt");
 
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
-    public boolean verbose = false;
+    public boolean verbose = true;
 
     public Hardware () {/**empty constructor*/}
 
@@ -75,6 +86,12 @@ public class Hardware {
 
         shooterLift = hwMap.get(DcMotorEx.class, "shooterLift");
         shooter = hwMap.get(DcMotorEx.class, "shooter");
+        wobbleLift = hwMap.get(DcMotorEx.class, "wobbleLift");
+        wobbleArm = hwMap.get(DcMotorEx.class, "wobbleArm");
+
+        shooterLiftEnc = new Encoder(shooterLift, 8192, 1, shooterLiftToDeg,false);
+        wobbleArmEnc = new Encoder(wobbleArm, 8192, 1, wobbleArmToDeg,false);
+        wobbleLiftEnc = new Encoder(wobbleLift, 8192, 1, wobbleLiftToMM,false);
 
         // Drivetrain
         left = new Encoder(rearLeftDrive, 8192, 1, odometerToMM, false);
@@ -100,10 +117,14 @@ public class Hardware {
 
         shooterLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wobbleArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wobbleLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        shooterLift.setTargetPosition(0);
-        shooterLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        shooterLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        wobbleArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        wobbleLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         rearLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         rearRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -113,6 +134,9 @@ public class Hardware {
         shooterLift.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        wobbleLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        wobbleArm.setDirection(DcMotorSimple.Direction.FORWARD);
+
         rearLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rearRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -121,6 +145,9 @@ public class Hardware {
         shooterLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        wobbleLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wobbleArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         rearLeftDrive.setPower(0);
         rearRightDrive.setPower(0);
         frontLeftDrive.setPower(0);
@@ -128,6 +155,9 @@ public class Hardware {
 
         shooterLift.setPower(0);
         shooter.setVelocity(0);
+
+        wobbleArm.setPower(0);
+        wobbleLift.setPower(0);
 
         // Drivetrain class
         drivetrain = new MeccanumDrivetrain(rearLeftDrive, rearRightDrive,frontLeftDrive, frontRightDrive, odometry);

@@ -36,6 +36,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -59,10 +61,22 @@ public class Auto extends LinearOpMode {
 
     Hardware robot = new Hardware();
 
+    double distTol = 2;
+
+    double sounderHeight = 168;
+
+    double noRing = sounderHeight - 0;
+    double singleRing = sounderHeight - 20;
+    double fourRing = sounderHeight - 80;
+
     @Override
     public void runOpMode() {
         /** INIT */
         robot.init(hardwareMap);
+
+        //robot.odometry.setOffset((140 + 225), 225, Math.toRadians(90));
+
+        robot.odometry.setOffset(0, 0, 0);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -87,35 +101,31 @@ public class Auto extends LinearOpMode {
         runtime.reset();
 
         /** RUN OTHER STUFF*/
-        goToGoal(0, 1000, Math.toRadians(0));
 
-        goToGoal(1000, 1000, Math.toRadians(0));
+        goodWait(2000);
 
-        /**robot.drivetrain.linearGoToGoal(0, 1000, Math.toRadians(-90));
+        robot.sounderArm.setPosition(.4);
 
-        robot.drivetrain.linearGoToGoal(1000, 1000, Math.toRadians(-180));
+        goToGoal(545, 1190, Math.toRadians(90));
 
-        robot.drivetrain.linearGoToGoal(1000, 0, Math.toRadians(-180));
+        goodWait(1000);
 
-        robot.drivetrain.linearGoToGoal(1000, 0, Math.toRadians(-270));
+        double dist = robot.sounder.getDistance(DistanceUnit.MM);
 
-        robot.drivetrain.linearGoToGoal(0, 0, Math.toRadians(-270));
+        if (dist > singleRing + distTol) {
+            telemetry.addLine("no rings");
+            telemetry.update();
+        } else if (dist > fourRing + distTol) {
+            telemetry.addLine("1 rings");
+            telemetry.update();
+        } else {
+            telemetry.addLine("4 rings");
+            telemetry.update();
+        }
 
-        robot.drivetrain.linearGoToGoal(0, 1000, Math.toRadians(-270));
+        goodWait(5000);
 
-        robot.drivetrain.linearGoToGoal(1000, 1000, Math.toRadians(-270));
-
-        robot.drivetrain.linearGoToGoal(1000, 0, Math.toRadians(-270));
-
-        robot.drivetrain.linearGoToGoal(0, 0, Math.toRadians(-270));
-
-        robot.drivetrain.linearGoToGoal(1000, 1000, Math.toRadians(0));
-
-        robot.drivetrain.linearGoToGoal(0, 1000, Math.toRadians(180));
-
-        robot.drivetrain.linearGoToGoal(1000, 0, Math.toRadians(0));
-
-        robot.drivetrain.linearGoToGoal(500, 500, Math.toRadians(720));*/
+        robot.odometry.writePoseToFile();
     }
 
     public void waitForAuto() {
@@ -123,6 +133,8 @@ public class Auto extends LinearOpMode {
         boolean timeout = false;
 
         do {
+            robot.drivetrain.updateAutoDrive();
+
             // Send Odometry info
             telemetry.addLine("Odometry:");
             telemetry.addData("Theta", robot.odometry.getHeadingTheta());
@@ -132,10 +144,8 @@ public class Auto extends LinearOpMode {
             telemetry.addData("Right", robot.right.getDistance());
             telemetry.addData("Center", robot.center.getDistance());
             telemetry.addData("Conversion", robot.odometerToMM);
-            telemetry.addData("timer", timer.milliseconds());
+            telemetry.addLine("");
             telemetry.update();
-
-            robot.drivetrain.updateAutoDrive();
 
             if ((robot.drivetrain.isRunning())) {
                 timer.reset();
@@ -149,5 +159,24 @@ public class Auto extends LinearOpMode {
         robot.drivetrain.setGoal(x, y, heading);
 
         waitForAuto();
+    }
+
+    private void goodWait(double time) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        while (timer.milliseconds() < time && opModeIsActive()) {
+            // Send Odometry info
+            telemetry.addLine("Odometry:");
+            telemetry.addData("Theta", robot.odometry.getHeadingTheta());
+            telemetry.addData("X", robot.odometry.getX());
+            telemetry.addData("Y", robot.odometry.getY());
+            telemetry.addData("Left", robot.left.getDistance());
+            telemetry.addData("Right", robot.right.getDistance());
+            telemetry.addData("Center", robot.center.getDistance());
+            telemetry.addData("Conversion", robot.odometerToMM);
+            telemetry.addLine("");
+            telemetry.update();
+        }
     }
 }

@@ -62,7 +62,7 @@ public class Odometry {
     }
 
     public double getHeadingTheta() {
-        return tracking.getRobotHeading() + headingOffset;
+        return tracking.getRobotHeading();
     }
 
     public double getHeadingDeg() {
@@ -70,9 +70,15 @@ public class Odometry {
     }
 
     public void writePoseToFile() {
-        ReadWriteFile.writeFile(offsetX, String.valueOf(getX()));
-        ReadWriteFile.writeFile(offsetY, String.valueOf(getY()));
-        ReadWriteFile.writeFile(offsetTheta, String.valueOf(getHeadingTheta()));
+        if (offsetX.canWrite()) {
+            ReadWriteFile.writeFile(offsetX, String.valueOf(getX()));
+        }
+        if (offsetY.canWrite()) {
+            ReadWriteFile.writeFile(offsetY, String.valueOf(getY()));
+        }
+        if (offsetTheta.canWrite()) {
+            ReadWriteFile.writeFile(offsetTheta, String.valueOf(getHeadingTheta()));
+        }
     }
 
     public Pose2D readPoseFromFile() {
@@ -80,15 +86,15 @@ public class Odometry {
     }
 
     public double readXFromFile() {
-        return Double.valueOf(ReadWriteFile.readFile(offsetX).trim());
+        return Double.parseDouble(ReadWriteFile.readFile(offsetX).trim());
     }
 
     public double readYFromFile() {
-        return Double.valueOf(ReadWriteFile.readFile(offsetY).trim());
+        return Double.parseDouble(ReadWriteFile.readFile(offsetY).trim());
     }
 
     public double readHeadingFromFile() {
-        return Double.valueOf(ReadWriteFile.readFile(offsetTheta).trim());
+        return Double.parseDouble(ReadWriteFile.readFile(offsetTheta).trim());
     }
 
     public void setOffsetFromFile() {
