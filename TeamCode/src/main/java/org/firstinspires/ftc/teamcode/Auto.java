@@ -61,40 +61,28 @@ public class Auto extends LinearOpMode {
 
     Hardware robot = new Hardware();
 
-    double distTol = 2;
+    double distTol = .1;
 
-    double sounderHeight = 168;
+    double sounderHeight = 185;
 
     double noRing = sounderHeight - 0;
     double singleRing = sounderHeight - 20;
     double fourRing = sounderHeight - 80;
+
+    WobbleDepot wobbleDepot;
 
     @Override
     public void runOpMode() {
         /** INIT */
         robot.init(hardwareMap);
 
-        //robot.odometry.setOffset((140 + 225), 225, Math.toRadians(90));
-
-        robot.odometry.setOffset(0, 0, 0);
+        robot.odometry.setOffset((140 + 225), 225, Math.toRadians(90));
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         /** WAIT FOR START */
-        while (!isStarted()) {
-            // Send Odometry info
-            telemetry.addLine("Odometry:");
-            telemetry.addData("Theta", robot.odometry.getHeadingTheta());
-            telemetry.addData("X", robot.odometry.getX());
-            telemetry.addData("Y", robot.odometry.getY());
-            telemetry.addData("Left", robot.left.getDistance());
-            telemetry.addData("Right", robot.right.getDistance());
-            telemetry.addData("Center", robot.center.getDistance());
-            telemetry.addData("Conversion", robot.odometerToMM);
-            telemetry.addLine("");
-            telemetry.update();
-        }
+        while (!isStarted()) { }
 
         // Wait for the game to start (driver presses PLAY)
         //waitForStart();
@@ -102,26 +90,69 @@ public class Auto extends LinearOpMode {
 
         /** RUN OTHER STUFF*/
 
-        goodWait(2000);
+        //goodWait(2000);
 
-        robot.sounderArm.setPosition(.4);
+        robot.sounderArm.setPosition(.8);
 
-        goToGoal(545, 1190, Math.toRadians(90));
+        goToGoal(400, 600, Math.toRadians(90));
+
+        goToGoal(500, 1175, Math.toRadians(0));
 
         goodWait(1000);
 
         double dist = robot.sounder.getDistance(DistanceUnit.MM);
 
-        if (dist > singleRing + distTol) {
-            telemetry.addLine("no rings");
+        double numrings = (sounderHeight - dist)/20;
+
+        if (numrings < 1 - distTol) {
+            telemetry.addData("No Rings", dist);
+            telemetry.addData("", numrings);
             telemetry.update();
-        } else if (dist > fourRing + distTol) {
-            telemetry.addLine("1 rings");
+
+            wobbleDepot = WobbleDepot.FRONT;
+        } else if (numrings < 2 - distTol) {
+            telemetry.addData("1 Rings", dist);
+            telemetry.addData("", numrings);
             telemetry.update();
+
+            wobbleDepot = WobbleDepot.MIDDLE;
         } else {
-            telemetry.addLine("4 rings");
+            telemetry.addData("4 Rings", dist);
+            telemetry.addData("", numrings);
             telemetry.update();
+
+            wobbleDepot = WobbleDepot.BACK;
         }
+
+        robot.sounderArm.setPosition(.2);
+
+        //goToDepot(wobbleDepot);
+
+        //TODO: Drop Wobble
+
+        //goToGoal(480, 1700, Math.toRadians(0));
+        //goToGoal(1280, 1700, Math.toRadians(0));
+
+        //TODO: Shoot first powershot
+
+        //goToGoal(1450, 1700, Math.toRadians(0));
+
+        //TODO: Shoot second Powershot
+
+        //goToGoal(1610, 1700, Math.toRadians(0));
+
+        //TODO: Shoot third Powershot
+
+        //goToGoal(1150, 900, Math.toRadians(0));
+        //goToGoal(480, 900, Math.toRadians(180));
+
+        //TODO: Pickup second Wobble
+
+        //goToDepotTwo(wobbleDepot);
+
+        //TODO: Drop Second Wobble
+
+        //goToGoal(480, 2000, Math.toRadians(180));
 
         goodWait(5000);
 
@@ -135,21 +166,9 @@ public class Auto extends LinearOpMode {
         do {
             robot.drivetrain.updateAutoDrive();
 
-            // Send Odometry info
-            telemetry.addLine("Odometry:");
-            telemetry.addData("Theta", robot.odometry.getHeadingTheta());
-            telemetry.addData("X", robot.odometry.getX());
-            telemetry.addData("Y", robot.odometry.getY());
-            telemetry.addData("Left", robot.left.getDistance());
-            telemetry.addData("Right", robot.right.getDistance());
-            telemetry.addData("Center", robot.center.getDistance());
-            telemetry.addData("Conversion", robot.odometerToMM);
-            telemetry.addLine("");
-            telemetry.update();
-
             if ((robot.drivetrain.isRunning())) {
                 timer.reset();
-            } else if (timer.milliseconds() > 100) {
+            } else if (timer.milliseconds() > 750) {
                 timeout = true;
             }
         } while (robot.drivetrain.isRunning() && opModeIsActive() && !timeout);
@@ -166,17 +185,31 @@ public class Auto extends LinearOpMode {
         timer.reset();
 
         while (timer.milliseconds() < time && opModeIsActive()) {
-            // Send Odometry info
-            telemetry.addLine("Odometry:");
-            telemetry.addData("Theta", robot.odometry.getHeadingTheta());
-            telemetry.addData("X", robot.odometry.getX());
-            telemetry.addData("Y", robot.odometry.getY());
-            telemetry.addData("Left", robot.left.getDistance());
-            telemetry.addData("Right", robot.right.getDistance());
-            telemetry.addData("Center", robot.center.getDistance());
-            telemetry.addData("Conversion", robot.odometerToMM);
-            telemetry.addLine("");
-            telemetry.update();
+
+        }
+    }
+
+    private enum WobbleDepot {
+        FRONT, MIDDLE, BACK
+    }
+
+    private void goToDepot(WobbleDepot depot) {
+        if (depot == WobbleDepot.FRONT) {
+            goToGoal(480, 2280, Math.toRadians(-45));
+        } else if (depot == WobbleDepot.MIDDLE) {
+            goToGoal(480, 2900, Math.toRadians(45));
+        } else if (depot == WobbleDepot.BACK) {
+            goToGoal(480, 3200, Math.toRadians(-90));
+        }
+    }
+
+    private void goToDepotTwo(WobbleDepot depot) {
+        if (depot == WobbleDepot.FRONT) {
+            goToGoal(480, 1750, Math.toRadians(180+45));
+        } else if (depot == WobbleDepot.MIDDLE) {
+            goToGoal(480, 2320, Math.toRadians(180-45));
+        } else if (depot == WobbleDepot.BACK) {
+            goToGoal(480, 3100, Math.toRadians(180+90));
         }
     }
 }

@@ -25,7 +25,9 @@ public class Teleop extends OpMode {
          */
         robot.init(hardwareMap);
 
-        robot.odometry.setOffsetFromFile();
+        //robot.odometry.setOffsetFromFile();
+
+        robot.odometry.setOffset(0l, 0, Math.toRadians(90));
 
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
@@ -80,9 +82,9 @@ public class Teleop extends OpMode {
     private void verboseOutput() {
         // Send Odometry info
         telemetry.addLine("Odometry:");
-        telemetry.addData("Theta", robot.odometry.getHeadingTheta());
-        telemetry.addData("X", robot.odometry.getX());
-        telemetry.addData("Y", robot.odometry.getY());
+        telemetry.addData("Theta", roundAvoid(robot.odometry.getHeadingTheta(), 2));
+        telemetry.addData("X", roundAvoid(robot.odometry.getX(), 2));
+        telemetry.addData("Y", roundAvoid(robot.odometry.getY(), 2));
         telemetry.addData("Left", robot.left.getDistance());
         telemetry.addData("Right", robot.right.getDistance());
         telemetry.addData("Center", robot.center.getDistance());
@@ -139,5 +141,10 @@ public class Teleop extends OpMode {
         telemetry.addLine("Sensors:");
         telemetry.addData("sounder distance mm", robot.sounder.getDistance(DistanceUnit.MM));
         telemetry.addLine("");
+    }
+
+    public static double roundAvoid(double value, int places) {
+        double scale = Math.pow(10, places);
+        return Math.round(value * scale) / scale;
     }
 }

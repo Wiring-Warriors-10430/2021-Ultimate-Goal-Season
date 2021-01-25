@@ -47,6 +47,8 @@ public class Odometry {
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.headingOffset = headingOffsetRad;
+
+        tracking.setRobotHeadingOffset(headingOffset);
     }
 
     public Pose2D getPos2D() {
@@ -66,7 +68,7 @@ public class Odometry {
     }
 
     public double getHeadingDeg() {
-        return Math.toDegrees(getHeadingTheta()) + Math.toDegrees(headingOffset);
+        return Math.toDegrees(getHeadingTheta());
     }
 
     public void writePoseToFile() {

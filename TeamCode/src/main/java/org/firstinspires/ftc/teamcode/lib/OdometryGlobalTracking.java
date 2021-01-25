@@ -9,6 +9,8 @@ public class OdometryGlobalTracking implements Runnable {
     private double leftOdometer = 0, rightOdometer = 0, centerOdometer = 0;
     private double robotX = 0, robotY = 0, robotTheta = 0;
 
+    private double headingOffset = 0;
+
     private Encoder left, right, center;
 
     private boolean isRunning = true;
@@ -40,8 +42,8 @@ public class OdometryGlobalTracking implements Runnable {
 
         double averageDeltaY = (deltaLeft + deltaRight) / 2;
 
-        robotX = robotX + (averageDeltaY*Math.sin(robotTheta) + localDeltaX*Math.cos(robotTheta));
-        robotY = robotY + (averageDeltaY*Math.cos(robotTheta) - localDeltaX*Math.sin(robotTheta));
+        robotX = robotX + (averageDeltaY*Math.sin(robotTheta + headingOffset) + localDeltaX*Math.cos(robotTheta + headingOffset));
+        robotY = robotY + (averageDeltaY*Math.cos(robotTheta + headingOffset) - localDeltaX*Math.sin(robotTheta + headingOffset));
 
         leftOdometer = newLeft;
         rightOdometer = newRight;
@@ -50,7 +52,7 @@ public class OdometryGlobalTracking implements Runnable {
 
     public double getRobotHeading() {
         // Negate to work on the unit Circle.
-        return -robotTheta;
+        return -robotTheta - headingOffset;
     }
 
     public double getRobotX() {
@@ -59,6 +61,10 @@ public class OdometryGlobalTracking implements Runnable {
 
     public double getRobotY() {
         return robotY;
+    }
+
+    public void setRobotHeadingOffset(double offset) {
+        headingOffset = -offset;
     }
 
     /**
