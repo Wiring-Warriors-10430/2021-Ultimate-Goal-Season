@@ -126,33 +126,33 @@ public class Auto extends LinearOpMode {
 
         robot.sounderArm.setPosition(.2);
 
-        //goToDepot(wobbleDepot);
+        goToDepot(wobbleDepot);
 
         //TODO: Drop Wobble
 
-        //goToGoal(480, 1700, Math.toRadians(0));
-        //goToGoal(1280, 1700, Math.toRadians(0));
+        goToGoal(480, 1700, Math.toRadians(0));
+        goToGoal(1280, 1700, Math.toRadians(0));
 
         //TODO: Shoot first powershot
 
-        //goToGoal(1450, 1700, Math.toRadians(0));
+        goToGoal(1450, 1700, Math.toRadians(0));
 
         //TODO: Shoot second Powershot
 
-        //goToGoal(1610, 1700, Math.toRadians(0));
+        goToGoal(1610, 1700, Math.toRadians(0));
 
         //TODO: Shoot third Powershot
 
-        //goToGoal(1150, 900, Math.toRadians(0));
-        //goToGoal(480, 900, Math.toRadians(180));
+        goToGoal(1150, 900, Math.toRadians(0));
+        goToGoal(480, 900, Math.toRadians(180));
 
         //TODO: Pickup second Wobble
 
-        //goToDepotTwo(wobbleDepot);
+        goToDepotTwo(wobbleDepot);
 
         //TODO: Drop Second Wobble
 
-        //goToGoal(480, 2000, Math.toRadians(180));
+        goToGoal(480, 2000, Math.toRadians(180));
 
         goodWait(5000);
 
@@ -199,7 +199,7 @@ public class Auto extends LinearOpMode {
         } else if (depot == WobbleDepot.MIDDLE) {
             goToGoal(480, 2900, Math.toRadians(45));
         } else if (depot == WobbleDepot.BACK) {
-            goToGoal(480, 3200, Math.toRadians(-90));
+            goToGoal(480, 3100, Math.toRadians(-90));
         }
     }
 
