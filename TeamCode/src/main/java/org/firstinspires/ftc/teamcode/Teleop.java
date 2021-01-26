@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.lib.Joystick;
+import org.firstinspires.ftc.teamcode.lib.MoreMath;
 import org.firstinspires.ftc.teamcode.lib.Pose2D;
 
 @TeleOp(name="Odometry Test", group="Odometry")
@@ -82,9 +83,9 @@ public class Teleop extends OpMode {
     private void verboseOutput() {
         // Send Odometry info
         telemetry.addLine("Odometry:");
-        telemetry.addData("Theta", roundAvoid(robot.odometry.getHeadingTheta(), 2));
-        telemetry.addData("X", roundAvoid(robot.odometry.getX(), 2));
-        telemetry.addData("Y", roundAvoid(robot.odometry.getY(), 2));
+        telemetry.addData("Theta", MoreMath.round(robot.odometry.getHeadingTheta(), 2));
+        telemetry.addData("X", MoreMath.round(robot.odometry.getX(), 2));
+        telemetry.addData("Y", MoreMath.round(robot.odometry.getY(), 2));
         telemetry.addData("Left", robot.left.getDistance());
         telemetry.addData("Right", robot.right.getDistance());
         telemetry.addData("Center", robot.center.getDistance());
@@ -141,10 +142,5 @@ public class Teleop extends OpMode {
         telemetry.addLine("Sensors:");
         telemetry.addData("sounder distance mm", robot.sounder.getDistance(DistanceUnit.MM));
         telemetry.addLine("");
-    }
-
-    public static double roundAvoid(double value, int places) {
-        double scale = Math.pow(10, places);
-        return Math.round(value * scale) / scale;
     }
 }

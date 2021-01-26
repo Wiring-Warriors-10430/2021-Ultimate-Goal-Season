@@ -19,6 +19,8 @@ public class MeccanumDrivetrain {
     private double goalY = 0;
     private double goalHeading = 0;
 
+    private double maxVoltage = 12.5;
+
     public MeccanumDrivetrain(DcMotorEx rearLeftDrive, DcMotorEx rearRightDrive, DcMotorEx frontLeftDrive, DcMotorEx frontRightDrive, Odometry odometry) {
           this.rearLeftDrive = rearLeftDrive;
           this.rearRightDrive = rearRightDrive;
