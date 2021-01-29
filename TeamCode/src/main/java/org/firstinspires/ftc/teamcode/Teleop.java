@@ -28,7 +28,7 @@ public class Teleop extends OpMode {
 
         //robot.odometry.setOffsetFromFile();
 
-        robot.odometry.setOffset(0l, 0, Math.toRadians(90));
+        robot.odometry.setOffset(0, 0, Math.toRadians(90));
 
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);

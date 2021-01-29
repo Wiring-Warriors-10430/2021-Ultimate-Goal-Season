@@ -11,9 +11,9 @@ public class MeccanumDrivetrain {
 
     private Odometry odometry;
 
-    private PIDFController xPID = new PIDFController(.011,0,.1,0, 5);
-    private PIDFController yPID = new PIDFController(.011,0,.1,0, 5);
-    private PIDFController thetaPID = new PIDFController(5.5,0,20,0, Math.toRadians(1));
+    private PIDFController xPID = new PIDFController(.011,0,.1,0, 5, 100);
+    private PIDFController yPID = new PIDFController(.011,0,.1,0, 5, 100);
+    private PIDFController thetaPID = new PIDFController(5.5,0,20,0, Math.toRadians(1), 100);
 
     private double goalX = 0;
     private double goalY = 0;

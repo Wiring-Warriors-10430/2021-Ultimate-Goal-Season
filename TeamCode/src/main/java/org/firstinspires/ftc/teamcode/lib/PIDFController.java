@@ -8,12 +8,15 @@ public class PIDFController {
     private double kD = 0;
     private double kF = 0;
 
+    private double rampDist = 0;
+
     private boolean enabled;
 
     private double previous_error = 0;
     private double integral = 0;
 
     private double setpoint = 0;
+    private double startPoint = 0;
     private double lastTime = 0;
 
     private double output = 0;
@@ -22,13 +25,17 @@ public class PIDFController {
 
     private boolean running;
 
+    private boolean bool = true;
+
     private ElapsedTime time = new ElapsedTime();
 
-    public PIDFController(double kP, double kI, double kD, double kF, double tolerance) {
+    public PIDFController(double kP, double kI, double kD, double kF, double tolerance, double rampUpDist) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.kF = kF;
+
+        this.rampDist = rampUpDist;
 
         this.tolerance = tolerance;
 
@@ -37,19 +44,24 @@ public class PIDFController {
 
     public double run(double currentPosition) {
         if (enabled) {
+            if (bool) {
+                startPoint = currentPosition;
+                bool = false;
+            }
+
             if (!(setpoint - tolerance <= currentPosition && currentPosition <= setpoint + tolerance)) {
                 running = true;
 
-                double dt = time.milliseconds() - lastTime;
+                double ramp = rampIGuess(currentPosition);
+                double pid = pidIGuess(currentPosition);
 
-                double error = setpoint - currentPosition;
-                integral = integral + error * dt;
-                double derivative = (error - previous_error) / dt;
-                output = kP * error + kI * integral + kD * derivative;
-                previous_error = error;
-                lastTime = time.milliseconds();
-
-                return output;
+                if (ramp == -127) {
+                    return pid;
+                }  else if (pid > ramp) {
+                    return ramp;
+                } else {
+                    return pid;
+                }
             } else {
                 running = false;
                 return 0;
@@ -77,6 +89,8 @@ public class PIDFController {
     }
 
     public void setTarget(double ticks) {
+        bool = true;
+
         setpoint = ticks;
     }
 
@@ -86,5 +100,28 @@ public class PIDFController {
 
     public boolean isRunning() {
         return running;
+    }
+
+    private double pidIGuess(double currentPosition) {
+        double dt = time.milliseconds() - lastTime;
+
+        double error = setpoint - currentPosition;
+        integral = integral + error * dt;
+        double derivative = (error - previous_error) / dt;
+        output = kP * error + kI * integral + kD * derivative;
+        previous_error = error;
+        lastTime = time.milliseconds();
+
+        return output;
+    }
+
+    private double rampIGuess(double currentPosition) {
+        double distTraveled = Math.abs(currentPosition - startPoint);
+
+        if (distTraveled > rampDist) {
+            return -127;
+        } else {
+            return distTraveled/rampDist;
+        }
     }
 }
