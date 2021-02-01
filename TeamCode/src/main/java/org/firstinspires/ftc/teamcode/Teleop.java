@@ -28,12 +28,12 @@ public class Teleop extends OpMode {
 
         //robot.odometry.setOffsetFromFile();
 
-        robot.odometry.setOffset(0, 0, Math.toRadians(90));
+        robot.odometry.setOffset(0, 0, Math.toRadians(0));
 
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
 
-        robot.drivetrain.setGoal(500, 1000, Math.toRadians(90));
+        robot.drivetrain.setGoal(0, 1000, Math.toRadians(0));
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
@@ -58,16 +58,54 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
-                rightStick.getX(1));
+        //robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
+        //        rightStick.getX(1));
 
         if (gamepad1.a) {
             robot.drivetrain.updateAutoDrive();
         }
 
+        if (gamepad1.left_trigger > 0) {
+            double wobblePower = gamepad1.left_trigger;
+            robot.wobbleLeft.setPower(wobblePower);
+            robot.wobbleRight.setPower(wobblePower);
+        } else if (gamepad1.right_trigger > 0) {
+            double wobblePower = -gamepad1.right_trigger;
+            robot.wobbleLeft.setPower(wobblePower);
+            robot.wobbleRight.setPower(wobblePower);
+        } else {
+            robot.wobbleLeft.setPower(0);
+            robot.wobbleRight.setPower(0);
+        }
+
+        if (gamepad1.left_bumper) {
+            robot.shooter.setVelocity(robot.desiredSpeed, AngleUnit.DEGREES);
+        } else {
+            robot.shooter.setVelocity(0);
+        }
+
+        if (gamepad1.dpad_up) {
+            robot.wobbleLiftController.setTarget(200);
+        } else if (gamepad1.dpad_down) {
+            robot.wobbleLiftController.setTarget(0);
+        }
+
+        if (gamepad1.dpad_left) {
+            robot.wobbleArmController.setTarget(0);
+        } else if (gamepad1.dpad_right) {
+            robot.wobbleArmController.setTarget(90);
+        }
+
         if (robot.verbose) {
             verboseOutput();
         }
+
+        //robot.wobbleLift.setPower(-gamepad1.right_stick_y);
+        robot.wobbleArm.setPower(-gamepad1.left_stick_y);
+
+        //robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
+        //robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
+        //robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
 
         robot.odometry.writePoseToFile();
     }
@@ -91,6 +129,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Center", robot.center.getDistance());
         telemetry.addData("Conversion", robot.odometerToMM);
         telemetry.addLine("");
+        telemetry.addLine();
 
         // Send Joystick Info
         telemetry.addLine("Sticks");
@@ -100,6 +139,8 @@ public class Teleop extends OpMode {
         telemetry.addLine("rightStick:");
         telemetry.addData("X", rightStick.getX(1));
         telemetry.addData("Y", rightStick.getY(1));
+        telemetry.addLine();
+        telemetry.addLine();
 
         // Send Motor info
         telemetry.addLine("Motors:");
@@ -111,36 +152,54 @@ public class Teleop extends OpMode {
         telemetry.addData("frontLeftDrive port", robot.frontLeftDrive.getPortNumber());
         telemetry.addData("frontRightDrive power", robot.frontRightDrive.getPower());
         telemetry.addData("frontRightDrive port", robot.frontRightDrive.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("shooterLift power", robot.shooterLift.getPower());
-        telemetry.addData("shooterLift position", robot.shooterLift.getCurrentPosition());
-        telemetry.addData("shooterLift target position", robot.shooterLift.getTargetPosition());
+        telemetry.addData("shooterLift position", robot.shooterLiftEnc.getDistance());
         telemetry.addData("shooterLift port", robot.shooterLift.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("shooter power", robot.shooter.getPower());
         telemetry.addData("shooter degrees/time", robot.shooter.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("shooter degrees/time", robot.shooter.getVelocity(AngleUnit.DEGREES) / (360) * 60);
         telemetry.addData("shooter port", robot.shooter.getPortNumber());
+        telemetry.addLine();
+        telemetry.addData("Wobble lift power", robot.wobbleLift.getPower());
+        telemetry.addData("Wobble lift port", robot.wobbleLift.getPortNumber());
+        telemetry.addData("Wobble lift encoder", robot.wobbleLiftEnc.getDistance());
+        telemetry.addLine();
+        telemetry.addData("Wobble arm power", robot.wobbleArm.getPower());
+        telemetry.addData("Wobble arm port", robot.wobbleArm.getPortNumber());
+        telemetry.addData("Wobble arm encoder", robot.wobbleArmEnc.getDistance());
         telemetry.addLine("");
+        telemetry.addLine();
 
         // Send Servo info
         telemetry.addLine("Servos:");
         telemetry.addData("intake power", robot.intake.getPower());
         telemetry.addData("intake port", robot.intake.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("feeder power", robot.feeder.getPower());
         telemetry.addData("feeder port", robot.feeder.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("wobbleLeft power", robot.wobbleLeft.getPower());
         telemetry.addData("wobbleLeft port", robot.wobbleLeft.getPortNumber());
         telemetry.addData("wobbleRight power", robot.wobbleRight.getPower());
         telemetry.addData("wobbleRight port", robot.wobbleRight.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("pusher position", robot.pusher.getPosition());
         telemetry.addData("pusher port", robot.pusher.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("indexer position", robot.indexer.getPosition());
         telemetry.addData("indexer port", robot.indexer.getPortNumber());
+        telemetry.addLine();
         telemetry.addData("sounderArm position", robot.sounderArm.getPosition());
         telemetry.addData("sounderArm port", robot.sounderArm.getPortNumber());
         telemetry.addLine("");
+        telemetry.addLine();
 
         // Send Sensor info
         telemetry.addLine("Sensors:");
         telemetry.addData("sounder distance mm", robot.sounder.getDistance(DistanceUnit.MM));
         telemetry.addLine("");
+        telemetry.addLine();
     }
 }
