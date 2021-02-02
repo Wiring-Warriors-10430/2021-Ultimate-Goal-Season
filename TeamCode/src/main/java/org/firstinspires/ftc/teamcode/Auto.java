@@ -129,30 +129,82 @@ public class Auto extends LinearOpMode {
         goToDepot(wobbleDepot);
 
         //TODO: Drop Wobble
+        robot.wobbleArm.setPower(.5);
+
+        goodWait(50);
+
+        robot.wobbleArm.setPower(0);
+
+        robot.wobbleLeft.setPower(-1);
+        robot.wobbleRight.setPower(-1);
 
         goToGoal(480, 1700, Math.toRadians(0));
         goToGoal(1280, 1700, Math.toRadians(0));
 
         //TODO: Shoot first powershot
+        robot.indexer.setPosition(.5);
+
+        goodWait(50);
+
+        robot.pusher.setPosition(1);
+
+        goodWait(50);
+
+        robot.pusher.setPosition(0);
+
+        goodWait(50);
+
 
         goToGoal(1450, 1700, Math.toRadians(0));
 
         //TODO: Shoot second Powershot
+        robot.indexer.setPosition(.35);
+
+        goodWait(50);
+
+        robot.pusher.setPosition(1);
+
+        goodWait(50);
+
+        robot.pusher.setPosition(0);
+
+        goodWait(50);
 
         goToGoal(1610, 1700, Math.toRadians(0));
 
         //TODO: Shoot third Powershot
+        robot.indexer.setPosition(.2);
+
+        goodWait(50);
+
+        robot.pusher.setPosition(1);
+
+        goodWait(50);
+
+        robot.pusher.setPosition(0);
+
+        goodWait(50);
+
+        robot.wobbleLeft.setPower(1);
+        robot.wobbleRight.setPower(1);
 
         goToGoal(1150, 900, Math.toRadians(0));
         goToGoal(480, 900, Math.toRadians(180));
 
         //TODO: Pickup second Wobble
+        robot.wobbleLeft.setPower(0);
+        robot.wobbleRight.setPower(0);
 
         goToDepotTwo(wobbleDepot);
 
         //TODO: Drop Second Wobble
+        robot.wobbleLeft.setPower(-1);
+        robot.wobbleRight.setPower(-1);
 
         goToGoal(480, 2000, Math.toRadians(180));
+
+        robot.wobbleLeft.setPower(0);
+        robot.wobbleRight.setPower(0);
 
         goodWait(5000);
 
