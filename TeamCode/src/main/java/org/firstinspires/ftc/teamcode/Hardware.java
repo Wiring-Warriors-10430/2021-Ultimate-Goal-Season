@@ -66,7 +66,7 @@ public class Hardware {
     public final static double wobbleArmToDeg = ((753.2) * wobbleArmReduction) / 360;
 
     private double tol = 16;   // Set to the amount of ticks per second you are ok being off.
-    private double shooterRPM = 10;   // TODO: Set to desired RPM of motor.
+    private double shooterRPM = 5500;   // TODO: Set to desired RPM of motor.
     private double shooterRPS = shooterRPM / 60;
     public double desiredSpeed = shooterRPS * 360;
 

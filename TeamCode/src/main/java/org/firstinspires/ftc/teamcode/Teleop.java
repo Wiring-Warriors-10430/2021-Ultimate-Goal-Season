@@ -16,6 +16,11 @@ public class Teleop extends OpMode {
     Joystick leftStick;
     Joystick rightStick;
 
+    double setPos = .2;
+    double min = .2;
+    double max = .8;
+    double moveAmount = 0.05;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -58,12 +63,8 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        //robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
-        //        rightStick.getX(1));
-
-        if (gamepad1.a) {
-            robot.drivetrain.updateAutoDrive();
-        }
+        robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
+                rightStick.getX(1));
 
         if (gamepad1.left_trigger > 0) {
             double wobblePower = gamepad1.left_trigger;
@@ -84,16 +85,28 @@ public class Teleop extends OpMode {
             robot.shooter.setVelocity(0);
         }
 
-        if (gamepad1.dpad_up) {
-            robot.wobbleLiftController.setTarget(200);
-        } else if (gamepad1.dpad_down) {
-            robot.wobbleLiftController.setTarget(0);
+        if (gamepad1.right_bumper) {
+            robot.intake.setPower(1.0);
+        } else {
+            robot.intake.setPower(-.1);
         }
 
-        if (gamepad1.dpad_left) {
-            robot.wobbleArmController.setTarget(0);
-        } else if (gamepad1.dpad_right) {
-            robot.wobbleArmController.setTarget(90);
+        if (gamepad2.dpad_up) {
+            robot.wobbleLift.setPower(.8);
+        } else if (gamepad2.dpad_down) {
+            robot.wobbleLift.setPower(-.2);
+        }
+
+        if (gamepad2.y) {
+            robot.indexer.setPosition(setPos -= moveAmount);
+        } else if (gamepad2.a) {
+            robot.indexer.setPosition(setPos += moveAmount);
+        }
+
+        if (gamepad2.b) {
+            robot.pusher.setPosition(1.0);
+        } else {
+            robot.pusher.setPosition(0);
         }
 
         if (robot.verbose) {
@@ -101,13 +114,14 @@ public class Teleop extends OpMode {
         }
 
         //robot.wobbleLift.setPower(-gamepad1.right_stick_y);
-        robot.wobbleArm.setPower(-gamepad1.left_stick_y);
+        robot.wobbleArm.setPower(-gamepad2.right_stick_y);
+        robot.shooterLift.setPower(-gamepad2.left_stick_y);
 
         //robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
         //robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
         //robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
 
-        robot.odometry.writePoseToFile();
+        //robot.odometry.writePoseToFile();
     }
 
     /*
