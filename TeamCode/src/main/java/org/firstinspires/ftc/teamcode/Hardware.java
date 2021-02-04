@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
@@ -60,15 +61,15 @@ public class Hardware {
 
     public final static double odometerToMM = (1 / 8192d) * (38d * Math.PI);
 
-    public final static double shooterLiftToDeg = (360/2786);
-    public final static double wobbleLiftToMM = (1/383.6d) * (40d * Math.PI);
-    public final static double wobbleArmReduction = 24;
-    public final static double wobbleArmToDeg = ((753.2) * wobbleArmReduction) / 360;
+    public final static double shooterLiftToDeg = (360d/(2786d*2));
+    public final static double wobbleLiftToMM = (1/383.6d) * (47.625d * Math.PI);
+    public final static double wobbleArmReduction = 4.5;
+    public final static double wobbleArmToDeg = 360d / ((753.2d) * wobbleArmReduction);
 
     private double tol = 16;   // Set to the amount of ticks per second you are ok being off.
-    private double shooterRPM = 5500;   // TODO: Set to desired RPM of motor.
+    private double shooterRPM = 4500;   // TODO: Set to desired RPM of motor.
     private double shooterRPS = shooterRPM / 60;
-    public double desiredSpeed = shooterRPS * 360;
+    public double desiredSpeed = shooterRPS * 28;
 
     private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation.txt");
     private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset.txt");
@@ -100,13 +101,13 @@ public class Hardware {
         wobbleArm = hwMap.get(DcMotorEx.class, "wobbleArm");
 
         shooterLiftEnc = new Encoder(shooterLift, 8192, 1, shooterLiftToDeg,false);
-        wobbleArmEnc = new Encoder(wobbleArm, 8192, 1, wobbleArmToDeg,true);
+        wobbleArmEnc = new Encoder(wobbleArm, 8192, 1, wobbleArmToDeg,false);
         wobbleLiftEnc = new Encoder(wobbleLift, 8192, 1, wobbleLiftToMM,false);
 
         // Drivetrain
-        left = new Encoder(rearLeftDrive, 8192, 1, odometerToMM, false);
+        left = new Encoder(rearLeftDrive, 8192, 1, odometerToMM, true);
         right = new Encoder(frontLeftDrive, 8192, 1, odometerToMM, false);
-        center = new Encoder(rearRightDrive, 8192, 1, odometerToMM, false);
+        center = new Encoder(rearRightDrive, 8192, 1, odometerToMM, true);
 
         left.reset();
         right.reset();
@@ -136,8 +137,8 @@ public class Hardware {
         wobbleArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         wobbleLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        rearLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rearLeftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rearRightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -169,8 +170,10 @@ public class Hardware {
         wobbleArm.setPower(0);
         wobbleLift.setPower(0);
 
-        shooterLiftController = new PIDFController(.001, 0, 0, 0, 1, 0);
-        wobbleLiftController = new PIDFController(.001, 0, 0, 0, 1, 0);
+        shooter.setVelocityPIDFCoefficients(10, 0, 0, 0);
+
+        shooterLiftController = new PIDFController(.1, 0, 0, 0, 1, 0);
+        wobbleLiftController = new PIDFController(.035, 0, 0, 0, 1, 0);
         wobbleArmController = new PIDFController(.01, 0, 0, 0, 1, 0);
 
         // Drivetrain class
@@ -186,7 +189,7 @@ public class Hardware {
         wobbleLeft = hwMap.get(CRServo.class, "wobbleLeft");
         wobbleRight = hwMap.get(CRServo.class, "wobbleRight");
 
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
         wobbleLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         wobbleRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -207,7 +210,7 @@ public class Hardware {
 
         // .2 - .8 because linear servo, .2 - .6 because mechanics
         indexer.setPosition(.2);
-        pusher.setPosition(.5);
+        pusher.setPosition(.22);
         // .2 - .8 because linear servo
         sounderArm.setPosition(.2);
 

@@ -76,13 +76,15 @@ public class Auto extends LinearOpMode {
         /** INIT */
         robot.init(hardwareMap);
 
-        robot.odometry.setOffset((140 + 225), 225, Math.toRadians(90));
+        robot.odometry.setOffset((140 + 225), 225-190, Math.toRadians(90));
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        robot.indexer.setPosition(.8);
+
         /** WAIT FOR START */
-        while (!isStarted()) { }
+        waitForStart();
 
         // Wait for the game to start (driver presses PLAY)
         //waitForStart();
@@ -98,7 +100,9 @@ public class Auto extends LinearOpMode {
 
         goToGoal(500, 1175, Math.toRadians(0));
 
-        goodWait(1000);
+        goodWait(500);
+
+        robot.wobbleArmController.setTarget(90); //TODO: tune
 
         double dist = robot.sounder.getDistance(DistanceUnit.MM);
 
@@ -128,87 +132,89 @@ public class Auto extends LinearOpMode {
 
         goToDepot(wobbleDepot);
 
-        //TODO: Drop Wobble
-        robot.wobbleArm.setPower(.5);
+        robot.shooter.setVelocity(robot.desiredSpeed); //TODO: tune
+        robot.shooterLiftController.setTarget(20); //TODO: tune
 
-        goodWait(50);
+        goodWait(250);
 
-        robot.wobbleArm.setPower(0);
-
-        robot.wobbleLeft.setPower(-1);
-        robot.wobbleRight.setPower(-1);
-
-        goToGoal(480, 1700, Math.toRadians(0));
+        goToGoal(540, 1700, Math.toRadians(0));
         goToGoal(1280, 1700, Math.toRadians(0));
 
-        //TODO: Shoot first powershot
-        robot.indexer.setPosition(.5);
+        robot.indexer.setPosition(.5); //TODO: tune
 
-        goodWait(50);
-
-        robot.pusher.setPosition(1);
-
-        goodWait(50);
+        goodWait(100);
 
         robot.pusher.setPosition(0);
 
-        goodWait(50);
+        goodWait(100);
+
+        robot.pusher.setPosition(.22);
+
+        goodWait(100);
 
 
         goToGoal(1450, 1700, Math.toRadians(0));
 
-        //TODO: Shoot second Powershot
-        robot.indexer.setPosition(.35);
+        robot.indexer.setPosition(.35); //TODO: tune
 
-        goodWait(50);
-
-        robot.pusher.setPosition(1);
-
-        goodWait(50);
+        goodWait(100);
 
         robot.pusher.setPosition(0);
 
-        goodWait(50);
+        goodWait(100);
+
+        robot.pusher.setPosition(.22);
+
+        goodWait(100);
 
         goToGoal(1610, 1700, Math.toRadians(0));
 
-        //TODO: Shoot third Powershot
-        robot.indexer.setPosition(.2);
+        robot.indexer.setPosition(.2); //TODO: tune
 
-        goodWait(50);
-
-        robot.pusher.setPosition(1);
-
-        goodWait(50);
+        goodWait(100);
 
         robot.pusher.setPosition(0);
 
-        goodWait(50);
+        goodWait(100);
+
+        robot.pusher.setPosition(.22);
+
+        goodWait(100);
+
+        robot.shooter.setVelocity(0);
+
+        robot.shooterLiftController.setTarget(0);
 
         robot.wobbleLeft.setPower(1);
         robot.wobbleRight.setPower(1);
 
-        goToGoal(1150, 900, Math.toRadians(0));
-        goToGoal(480, 900, Math.toRadians(180));
+        goToGoal(1327, 960, Math.toRadians(0)); //TODO: tune
+        goToGoal(1327, 773, Math.toRadians(0));
 
-        //TODO: Pickup second Wobble
         robot.wobbleLeft.setPower(0);
         robot.wobbleRight.setPower(0);
+
+        goToGoal(480, 900, Math.toRadians(180));
 
         goToDepotTwo(wobbleDepot);
 
-        //TODO: Drop Second Wobble
         robot.wobbleLeft.setPower(-1);
         robot.wobbleRight.setPower(-1);
 
-        goToGoal(480, 2000, Math.toRadians(180));
+        goodWait(250);
+
+        goToGoal(600, 2000, Math.toRadians(180));
 
         robot.wobbleLeft.setPower(0);
         robot.wobbleRight.setPower(0);
 
-        goodWait(5000);
-
         robot.odometry.writePoseToFile();
+    }
+
+    private void myIdle() {
+        robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
+        robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
+        robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
     }
 
     public void waitForAuto() {
@@ -223,6 +229,7 @@ public class Auto extends LinearOpMode {
             } else if (timer.milliseconds() > 750) {
                 timeout = true;
             }
+            myIdle();
         } while (robot.drivetrain.isRunning() && opModeIsActive() && !timeout);
     }
 
@@ -237,7 +244,7 @@ public class Auto extends LinearOpMode {
         timer.reset();
 
         while (timer.milliseconds() < time && opModeIsActive()) {
-
+            myIdle();
         }
     }
 
@@ -248,10 +255,20 @@ public class Auto extends LinearOpMode {
     private void goToDepot(WobbleDepot depot) {
         if (depot == WobbleDepot.FRONT) {
             goToGoal(480, 2280, Math.toRadians(-45));
+            robot.wobbleLeft.setPower(-1);
+            robot.wobbleRight.setPower(-1);
+            goodWait(250);
+            goToGoal(560, 2400, Math.toRadians(0));
         } else if (depot == WobbleDepot.MIDDLE) {
             goToGoal(480, 2900, Math.toRadians(45));
+            robot.wobbleLeft.setPower(-1);
+            robot.wobbleRight.setPower(-1);
+            goodWait(250);
         } else if (depot == WobbleDepot.BACK) {
             goToGoal(480, 3100, Math.toRadians(-90));
+            robot.wobbleLeft.setPower(-1);
+            robot.wobbleRight.setPower(-1);
+            goodWait(250);
         }
     }
 

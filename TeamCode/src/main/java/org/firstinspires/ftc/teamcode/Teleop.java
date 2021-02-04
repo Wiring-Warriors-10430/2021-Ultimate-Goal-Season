@@ -19,7 +19,10 @@ public class Teleop extends OpMode {
     double setPos = .2;
     double min = .2;
     double max = .8;
-    double moveAmount = 0.05;
+    double moveAmount = 0.01;
+
+    boolean shooterDown = true;
+    boolean debounce = false;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -87,26 +90,60 @@ public class Teleop extends OpMode {
 
         if (gamepad1.right_bumper) {
             robot.intake.setPower(1.0);
+            robot.feeder.setPower(1.0);
         } else {
             robot.intake.setPower(-.1);
+            robot.feeder.setPower(-.1);
         }
 
-        if (gamepad2.dpad_up) {
+        /**if (gamepad2.dpad_up) {
             robot.wobbleLift.setPower(.8);
         } else if (gamepad2.dpad_down) {
             robot.wobbleLift.setPower(-.2);
-        }
-
-        if (gamepad2.y) {
-            robot.indexer.setPosition(setPos -= moveAmount);
-        } else if (gamepad2.a) {
-            robot.indexer.setPosition(setPos += moveAmount);
-        }
-
-        if (gamepad2.b) {
-            robot.pusher.setPosition(1.0);
         } else {
+            robot.wobbleLift.setPower(0);
+        }*/
+
+        if (gamepad1.dpad_up) {
+            robot.wobbleLiftController.setTarget(300); //374.65
+        } else if (gamepad1.dpad_down) {
+            robot.wobbleLiftController.setTarget(0);
+        }
+
+        if (gamepad1.dpad_right) {
+            robot.wobbleArmController.setTarget(90);
+        } else if (gamepad1.dpad_left) {
+            robot.wobbleArmController.setTarget(0);
+        }
+
+        if (gamepad1.y) {
+            setPos = MoreMath.clamp(setPos-moveAmount, .2, .8);
+            robot.indexer.setPosition(setPos);
+        } else if (gamepad1.a) {
+            setPos = MoreMath.clamp(setPos+moveAmount, .2, .8);
+            robot.indexer.setPosition(setPos);
+        } else {
+            setPos = MoreMath.clamp(setPos, .2, .8);
+            robot.indexer.setPosition(setPos);
+        }
+
+        if (gamepad1.b) {
             robot.pusher.setPosition(0);
+        } else {
+            robot.pusher.setPosition(.22);
+        }
+
+        if (gamepad1.x && !debounce) {
+            shooterDown = !shooterDown;
+            debounce = true;
+        } else if (!gamepad1.x && debounce) {
+            debounce = false;
+        }
+
+        if (shooterDown) {
+            robot.shooterLiftController.setTarget(0);
+        } else {
+            robot.shooterLiftController.setTarget(20);
         }
 
         if (robot.verbose) {
@@ -114,12 +151,12 @@ public class Teleop extends OpMode {
         }
 
         //robot.wobbleLift.setPower(-gamepad1.right_stick_y);
-        robot.wobbleArm.setPower(-gamepad2.right_stick_y);
-        robot.shooterLift.setPower(-gamepad2.left_stick_y);
+        //robot.wobbleArm.setPower(-gamepad2.right_stick_y);
+        //robot.shooterLift.setPower(-gamepad2.left_stick_y);
 
-        //robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
-        //robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
-        //robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
+        robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
+        robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
+        robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
 
         //robot.odometry.writePoseToFile();
     }
@@ -172,7 +209,7 @@ public class Teleop extends OpMode {
         telemetry.addData("shooterLift port", robot.shooterLift.getPortNumber());
         telemetry.addLine();
         telemetry.addData("shooter power", robot.shooter.getPower());
-        telemetry.addData("shooter degrees/time", robot.shooter.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData("shooter degrees/time", robot.shooter.getVelocity());
         telemetry.addData("shooter degrees/time", robot.shooter.getVelocity(AngleUnit.DEGREES) / (360) * 60);
         telemetry.addData("shooter port", robot.shooter.getPortNumber());
         telemetry.addLine();

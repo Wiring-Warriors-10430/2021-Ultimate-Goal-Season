@@ -55,13 +55,15 @@ public class PIDFController {
                 double ramp = rampIGuess(currentPosition);
                 double pid = pidIGuess(currentPosition);
 
-                if (ramp == -127) {
+                if (ramp == -9999999999999999999.123456789123456789123456789123456789123456789123456789123456789) {
                     return pid;
                 }  else if (pid > ramp) {
                     return ramp;
                 } else {
                     return pid;
                 }
+
+                //return pid;
             } else {
                 running = false;
                 return 0;
@@ -119,9 +121,9 @@ public class PIDFController {
         double distTraveled = Math.abs(currentPosition - startPoint);
 
         if (distTraveled > rampDist) {
-            return -127;
+            return -9999999999999999999.123456789123456789123456789123456789123456789123456789123456789;
         } else {
-            return distTraveled/rampDist;
+            return distTraveled/rampDist + kF;
         }
     }
 }
