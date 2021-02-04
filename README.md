@@ -20,7 +20,7 @@ Joystick class used to double-square joysticks, both to make them less sensitive
 
 Meccanum drive class with field-centered controls to make auto super easy to work with (see [auto](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Auto.java)): [TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/MeccanumDrivetrain.java](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/MeccanumDrivetrain.java)
 
-More Math since Java math just isn't like python :wink:: [TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/MoreMath.java](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/MoreMath.java)
+More Math since Java math just isn't like python math :wink:: [TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/MoreMath.java](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/MoreMath.java)
 
 Odometry for field position tracking: [TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/Odometry.java](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/Odometry.java)
 
