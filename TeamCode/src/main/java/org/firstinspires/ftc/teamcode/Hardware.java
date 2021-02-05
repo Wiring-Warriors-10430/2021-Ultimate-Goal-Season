@@ -66,10 +66,10 @@ public class Hardware {
     public final static double wobbleArmReduction = 4.5;
     public final static double wobbleArmToDeg = 360d / ((753.2d) * wobbleArmReduction);
 
-    private double tol = 16;   // Set to the amount of ticks per second you are ok being off.
-    private double shooterRPM = 4500;   // TODO: Set to desired RPM of motor.
+    private double tol = 50;   // Set to the amount of ticks per second you are ok being off.
+    private double shooterRPM = 5400;   // TODO: Set to desired RPM of motor.
     private double shooterRPS = shooterRPM / 60;
-    public double desiredSpeed = shooterRPS * 28;
+    public double desiredSpeed = 2350; // shooterRPS * 28
 
     private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation.txt");
     private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset.txt");
@@ -209,7 +209,7 @@ public class Hardware {
         sounderArm.setDirection(Servo.Direction.FORWARD);
 
         // .2 - .8 because linear servo, .2 - .6 because mechanics
-        indexer.setPosition(.2);
+        indexer.setPosition(.8);
         pusher.setPosition(.22);
         // .2 - .8 because linear servo
         sounderArm.setPosition(.2);
@@ -222,8 +222,8 @@ public class Hardware {
         sounder = hwMap.get(DistanceSensor.class, "sounder");
     }
 
-    private boolean shooterAtSpeed() {
-        if (shooter.getVelocity() > desiredSpeed - tol && shooter.getVelocity() < desiredSpeed + tol) {
+    public boolean shooterAtSpeed() {
+        if (shooter.getVelocity() > desiredSpeed - tol) {
             return true;
         } else {
             return false;

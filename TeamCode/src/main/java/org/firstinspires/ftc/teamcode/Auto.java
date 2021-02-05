@@ -133,29 +133,14 @@ public class Auto extends LinearOpMode {
         goToDepot(wobbleDepot);
 
         robot.shooter.setVelocity(robot.desiredSpeed); //TODO: tune
-        robot.shooterLiftController.setTarget(20); //TODO: tune
+        robot.shooterLiftController.setTarget(25); //TODO: tune
 
         goodWait(250);
 
         goToGoal(540, 1700, Math.toRadians(0));
-        goToGoal(1280, 1700, Math.toRadians(0));
+        goToGoal(1280, 1700, Math.toRadians(15));
 
-        robot.indexer.setPosition(.5); //TODO: tune
-
-        goodWait(100);
-
-        robot.pusher.setPosition(0);
-
-        goodWait(100);
-
-        robot.pusher.setPosition(.22);
-
-        goodWait(100);
-
-
-        goToGoal(1450, 1700, Math.toRadians(0));
-
-        robot.indexer.setPosition(.35); //TODO: tune
+        robot.indexer.setPosition(.38); //TODO: tune
 
         goodWait(100);
 
@@ -167,9 +152,24 @@ public class Auto extends LinearOpMode {
 
         goodWait(100);
 
-        goToGoal(1610, 1700, Math.toRadians(0));
 
-        robot.indexer.setPosition(.2); //TODO: tune
+        goToGoal(1450, 1700, Math.toRadians(15));
+
+        robot.indexer.setPosition(.31); //TODO: tune
+
+        goodWait(100);
+
+        robot.pusher.setPosition(0);
+
+        goodWait(100);
+
+        robot.pusher.setPosition(.22);
+
+        goodWait(100);
+
+        goToGoal(1610, 1700, Math.toRadians(15));
+
+        robot.indexer.setPosition(.23); //TODO: tune
 
         goodWait(100);
 
@@ -182,6 +182,8 @@ public class Auto extends LinearOpMode {
         goodWait(100);
 
         robot.shooter.setVelocity(0);
+
+        robot.indexer.setPosition(.8);
 
         robot.shooterLiftController.setTarget(0);
 

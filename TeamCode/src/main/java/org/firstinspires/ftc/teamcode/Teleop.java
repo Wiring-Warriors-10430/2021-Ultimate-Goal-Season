@@ -16,13 +16,21 @@ public class Teleop extends OpMode {
     Joystick leftStick;
     Joystick rightStick;
 
-    double setPos = .2;
+    floorPos setPos = floorPos.INTAKE;
     double min = .2;
     double max = .8;
     double moveAmount = 0.01;
 
     boolean shooterDown = true;
     boolean debounce = false;
+
+    boolean debounce2 = false;
+    enum floorPos {
+        TOP,
+        MID,
+        BOTTOM,
+        INTAKE
+    }
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -82,15 +90,22 @@ public class Teleop extends OpMode {
             robot.wobbleRight.setPower(0);
         }
 
-        if (gamepad1.left_bumper) {
+        if (gamepad2.left_bumper) {
             robot.shooter.setVelocity(robot.desiredSpeed, AngleUnit.DEGREES);
         } else {
             robot.shooter.setVelocity(0);
         }
 
-        if (gamepad1.right_bumper) {
+        if (gamepad1.left_bumper) {
             robot.intake.setPower(1.0);
-            robot.feeder.setPower(1.0);
+            if (setPos == floorPos.INTAKE) {
+                robot.feeder.setPower(1.0);
+            } else {
+                robot.feeder.setPower(-.1);
+            }
+        } else if (gamepad1.right_bumper) {
+            robot.intake.setPower(-1.0);
+            robot.feeder.setPower(-1.0);
         } else {
             robot.intake.setPower(-.1);
             robot.feeder.setPower(-.1);
@@ -104,36 +119,57 @@ public class Teleop extends OpMode {
             robot.wobbleLift.setPower(0);
         }*/
 
-        if (gamepad1.dpad_up) {
+        if (gamepad2.dpad_up) {
             robot.wobbleLiftController.setTarget(300); //374.65
-        } else if (gamepad1.dpad_down) {
+        } else if (gamepad2.dpad_down) {
             robot.wobbleLiftController.setTarget(0);
         }
 
-        if (gamepad1.dpad_right) {
+        if (gamepad2.dpad_right) {
             robot.wobbleArmController.setTarget(90);
-        } else if (gamepad1.dpad_left) {
+        } else if (gamepad2.dpad_left) {
             robot.wobbleArmController.setTarget(0);
         }
 
-        if (gamepad1.y) {
+        /**if (gamepad2.y) {
             setPos = MoreMath.clamp(setPos-moveAmount, .2, .8);
             robot.indexer.setPosition(setPos);
-        } else if (gamepad1.a) {
+        } else if (gamepad2.a) {
             setPos = MoreMath.clamp(setPos+moveAmount, .2, .8);
             robot.indexer.setPosition(setPos);
         } else {
             setPos = MoreMath.clamp(setPos, .2, .8);
             robot.indexer.setPosition(setPos);
+        }*/
+
+        if (gamepad2.y && !debounce2) {
+            debounce2 = true;
+            if (setPos == floorPos.INTAKE) {
+                setPos = floorPos.BOTTOM;
+                robot.indexer.setPosition(0.38d);
+            } else if (setPos == floorPos.BOTTOM) {
+                setPos = floorPos.MID;
+                robot.indexer.setPosition(0.31d);
+            } else if (setPos == floorPos.MID) {
+                setPos = floorPos.TOP;
+                robot.indexer.setPosition(0.23d);
+            }
+        } else if (!gamepad2.y && debounce2) {
+            debounce2 = false;
         }
 
-        if (gamepad1.b) {
+        if (gamepad2.a && robot.shooterLiftController.getTarget() <= 2) {
+            setPos = floorPos.INTAKE;
+            robot.indexer.setPosition(.8);
+        }
+
+        if (gamepad2.b && robot.shooterAtSpeed()) {
             robot.pusher.setPosition(0);
         } else {
             robot.pusher.setPosition(.22);
         }
 
-        if (gamepad1.x && !debounce) {
+        if (gamepad2.x && !debounce) {
             shooterDown = !shooterDown;
             debounce = true;
         } else if (!gamepad1.x && debounce) {
@@ -143,7 +179,11 @@ public class Teleop extends OpMode {
         if (shooterDown) {
             robot.shooterLiftController.setTarget(0);
         } else {
-            robot.shooterLiftController.setTarget(20);
+            robot.shooterLiftController.setTarget(25);
+            if (floorPos.INTAKE == setPos) {
+                setPos = floorPos.BOTTOM;
+                robot.indexer.setPosition(.38);
+            }
         }
 
         if (robot.verbose) {
@@ -170,6 +210,13 @@ public class Teleop extends OpMode {
     }
 
     private void verboseOutput() {
+        telemetry.addData("angle", robot.shooterLiftEnc.getDistance());
+        telemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine();
+
         // Send Odometry info
         telemetry.addLine("Odometry:");
         telemetry.addData("Theta", MoreMath.round(robot.odometry.getHeadingTheta(), 2));
