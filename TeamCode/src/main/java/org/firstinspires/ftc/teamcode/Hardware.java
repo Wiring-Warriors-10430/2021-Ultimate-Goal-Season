@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.lib.PIDFController;
 import java.io.File;
 
 public class Hardware {
+    public static final double shooterAngle = 26;
+
     public DcMotorEx rearLeftDrive;
     public DcMotorEx rearRightDrive;
     public DcMotorEx frontLeftDrive;
@@ -67,9 +69,9 @@ public class Hardware {
     public final static double wobbleArmToDeg = 360d / ((753.2d) * wobbleArmReduction);
 
     private double tol = 50;   // Set to the amount of ticks per second you are ok being off.
-    private double shooterRPM = 5400;   // TODO: Set to desired RPM of motor.
+    private double shooterRPM = 5185;   // TODO: Set to desired RPM of motor. //5035
     private double shooterRPS = shooterRPM / 60;
-    public double desiredSpeed = 2350; // shooterRPS * 28
+    public double desiredSpeed = shooterRPS*28; // shooterRPS * 28
 
     private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation.txt");
     private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset.txt");
@@ -170,10 +172,10 @@ public class Hardware {
         wobbleArm.setPower(0);
         wobbleLift.setPower(0);
 
-        shooter.setVelocityPIDFCoefficients(10, 0, 0, 0);
+        shooter.setVelocityPIDFCoefficients(2, 0, 0, 0);
 
-        shooterLiftController = new PIDFController(.1, 0, 0, 0, 1, 0);
-        wobbleLiftController = new PIDFController(.035, 0, 0, 0, 1, 0);
+        shooterLiftController = new PIDFController(.15, 0, 0, 0, .2, 0);
+        wobbleLiftController = new PIDFController(.03, 0, 0, 0, 1, 0);
         wobbleArmController = new PIDFController(.01, 0, 0, 0, 1, 0);
 
         // Drivetrain class

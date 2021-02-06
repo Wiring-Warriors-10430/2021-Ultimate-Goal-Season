@@ -98,9 +98,9 @@ public class Auto extends LinearOpMode {
 
         goToGoal(400, 600, Math.toRadians(90));
 
-        goToGoal(500, 1175, Math.toRadians(0));
+        goToGoal(480, 1135, Math.toRadians(0));
 
-        goodWait(500);
+        goodWait(1000);
 
         robot.wobbleArmController.setTarget(90); //TODO: tune
 
@@ -130,48 +130,42 @@ public class Auto extends LinearOpMode {
 
         robot.sounderArm.setPosition(.2);
 
+        robot.indexer.setPosition(.39); //TODO: tune
+
         goToDepot(wobbleDepot);
 
         robot.shooter.setVelocity(robot.desiredSpeed); //TODO: tune
-        robot.shooterLiftController.setTarget(25); //TODO: tune
+        robot.shooterLiftController.setTarget(robot.shooterAngle); //TODO: tune
 
-        goodWait(250);
-
-        goToGoal(540, 1700, Math.toRadians(0));
-        goToGoal(1280, 1700, Math.toRadians(15));
-
-        robot.indexer.setPosition(.38); //TODO: tune
-
-        goodWait(100);
+        /**goToGoal(1280, 1000, Math.toRadians(15));
 
         robot.pusher.setPosition(0);
 
         goodWait(100);
 
         robot.pusher.setPosition(.22);
-
-        goodWait(100);
-
-
-        goToGoal(1450, 1700, Math.toRadians(15));
 
         robot.indexer.setPosition(.31); //TODO: tune
 
-        goodWait(100);
+        //goodWait(100);
+
+        goToGoal(1450, 1000, Math.toRadians(15));
+
+        goodWait(300); //MARK < Search to change indexer move times
 
         robot.pusher.setPosition(0);
 
         goodWait(100);
 
-        robot.pusher.setPosition(.22);
-
-        goodWait(100);
-
-        goToGoal(1610, 1700, Math.toRadians(15));
+        robot.pusher.setPosition(.21);
 
         robot.indexer.setPosition(.23); //TODO: tune
 
-        goodWait(100);
+        //goodWait(100);
+
+        goToGoal(1610, 1000, Math.toRadians(15));
+
+        goodWait(300); //MARK
 
         robot.pusher.setPosition(0);
 
@@ -179,7 +173,7 @@ public class Auto extends LinearOpMode {
 
         robot.pusher.setPosition(.22);
 
-        goodWait(100);
+        //goodWait(100);
 
         robot.shooter.setVelocity(0);
 
@@ -203,12 +197,14 @@ public class Auto extends LinearOpMode {
         robot.wobbleLeft.setPower(-1);
         robot.wobbleRight.setPower(-1);
 
-        goodWait(250);
-
-        goToGoal(600, 2000, Math.toRadians(180));
+        goodWait(250); */
 
         robot.wobbleLeft.setPower(0);
         robot.wobbleRight.setPower(0);
+
+        goodWait(4000);
+
+        //goToGoal(600, 2000, Math.toRadians(180));
 
         robot.odometry.writePoseToFile();
     }
@@ -217,6 +213,8 @@ public class Auto extends LinearOpMode {
         robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
         robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
         robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
+
+        teleDump();
     }
 
     public void waitForAuto() {
@@ -260,17 +258,24 @@ public class Auto extends LinearOpMode {
             robot.wobbleLeft.setPower(-1);
             robot.wobbleRight.setPower(-1);
             goodWait(250);
-            goToGoal(560, 2400, Math.toRadians(0));
+            robot.wobbleArmController.setTarget(0);
+            goToGoal(560, 2400, Math.toRadians(-180));
+            goToGoal(700, 1900, Math.toRadians(-180));
         } else if (depot == WobbleDepot.MIDDLE) {
             goToGoal(480, 2900, Math.toRadians(45));
             robot.wobbleLeft.setPower(-1);
             robot.wobbleRight.setPower(-1);
             goodWait(250);
+            robot.wobbleArmController.setTarget(0);
+            goToGoal(480, 2900, Math.toRadians(180));
+            goToGoal(400, 1900, Math.toRadians(180));
         } else if (depot == WobbleDepot.BACK) {
-            goToGoal(480, 3100, Math.toRadians(-90));
+            goToGoal(400, 3100, Math.toRadians(-90));
             robot.wobbleLeft.setPower(-1);
             robot.wobbleRight.setPower(-1);
             goodWait(250);
+            robot.wobbleArmController.setTarget(0);
+            goToGoal(700, 1900, Math.toRadians(-180));
         }
     }
 
@@ -282,5 +287,11 @@ public class Auto extends LinearOpMode {
         } else if (depot == WobbleDepot.BACK) {
             goToGoal(480, 3100, Math.toRadians(180+90));
         }
+    }
+
+    private void teleDump() {
+        telemetry.addData("Shooter Speed :", robot.shooter.getVelocity());
+        telemetry.addData("Ring maybe :", wobbleDepot);
+        telemetry.update();
     }
 }

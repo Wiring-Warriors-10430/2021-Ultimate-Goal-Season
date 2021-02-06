@@ -146,7 +146,7 @@ public class Teleop extends OpMode {
             debounce2 = true;
             if (setPos == floorPos.INTAKE) {
                 setPos = floorPos.BOTTOM;
-                robot.indexer.setPosition(0.38d);
+                robot.indexer.setPosition(0.39d);
             } else if (setPos == floorPos.BOTTOM) {
                 setPos = floorPos.MID;
                 robot.indexer.setPosition(0.31d);
@@ -179,7 +179,7 @@ public class Teleop extends OpMode {
         if (shooterDown) {
             robot.shooterLiftController.setTarget(0);
         } else {
-            robot.shooterLiftController.setTarget(25);
+            robot.shooterLiftController.setTarget(robot.shooterAngle);
             if (floorPos.INTAKE == setPos) {
                 setPos = floorPos.BOTTOM;
                 robot.indexer.setPosition(.38);
