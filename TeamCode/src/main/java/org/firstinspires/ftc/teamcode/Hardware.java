@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
@@ -46,6 +47,8 @@ public class Hardware {
     public PIDFController wobbleLiftController;
     public PIDFController wobbleArmController;
 
+    public PIDFController shooterVelocityController;
+
     public CRServo intake;
     public CRServo feeder;
     public Servo indexer;
@@ -56,6 +59,8 @@ public class Hardware {
     public Servo sounderArm;
 
     public DistanceSensor sounder;
+
+    public VoltageSensor voltageSensor;
 
     private double robotEncoderWheelDistance = 386;
     private double horizontalEncoderTickPerDegreeOffset;
@@ -73,12 +78,12 @@ public class Hardware {
     public double desiredSpeed = shooterRPS*28; // shooterRPS * 28
 
     private double autoTol = 50;   // Set to the amount of ticks per second you are ok being off.
-    private double autoShooterRPM = 3400; //3000   // TODO: Set to desired RPM of motor. //5185
+    private double autoShooterRPM = 3100; //3000   // TODO: Set to desired RPM of motor. //5185
     private double autoShooterRPS = autoShooterRPM / 60;
     public double autoDesiredSpeed = autoShooterRPS*28; // shooterRPS * 28
 
-    public static final double shooterAngle = 33;
-    public static final double autoShooterAngle = 33;
+    public static final double shooterAngle = 35;
+    public static final double autoShooterAngle = 35;
 
     public static final double indexerLowest = .8; //.8
     public static final double indexerLow = .38; //.39
@@ -102,6 +107,8 @@ public class Hardware {
         /**
          *    Init Drivetrain and DcMotors
          */
+        // Voltage Sensor
+        voltageSensor = hwMap.get(VoltageSensor.class, "Control Hub");
 
         // DcMotors
         rearLeftDrive = hwMap.get(DcMotorEx.class, "rearLeftDrive");
@@ -146,7 +153,7 @@ public class Hardware {
         wobbleLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         shooterLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         wobbleArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         wobbleLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -179,16 +186,18 @@ public class Hardware {
         frontRightDrive.setPower(0);
 
         shooterLift.setPower(0);
-        shooter.setVelocity(0);
+        //shooter.setVelocity(0);
 
         wobbleArm.setPower(0);
         wobbleLift.setPower(0);
 
-        shooter.setVelocityPIDFCoefficients(2, 0, 0, 0);
+        //shooter.setVelocityPIDFCoefficients(1.8, 0, 0, 0);
 
-        shooterLiftController = new PIDFController(.15, 0, 0, 0, .2, 0);
-        wobbleLiftController = new PIDFController(.03, 0, 0, 0, 1, 0);
-        wobbleArmController = new PIDFController(.01, 0, 0, 0, 1, 0);
+        shooterVelocityController = new PIDFController(.01, 0, 0, .3, 10, 0, .3, true);
+
+        shooterLiftController = new PIDFController(.15, 0, 0, 0, .2, 0, 0);
+        wobbleLiftController = new PIDFController(.03, 0, 0, 0, 1, 0, 0);
+        wobbleArmController = new PIDFController(.01, 0, 0, 0, 1, 0, 0);
 
         // Drivetrain class
         drivetrain = new MeccanumDrivetrain(rearLeftDrive, rearRightDrive,frontLeftDrive, frontRightDrive, odometry);

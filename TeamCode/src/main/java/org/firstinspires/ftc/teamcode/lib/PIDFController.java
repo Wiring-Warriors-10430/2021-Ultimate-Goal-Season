@@ -7,6 +7,7 @@ public class PIDFController {
     private double kI = 0;
     private double kD = 0;
     private double kF = 0;
+    private double kR = 0;
 
     private double rampDist = 0;
 
@@ -19,6 +20,8 @@ public class PIDFController {
     private double startPoint = 0;
     private double lastTime = 0;
 
+    private boolean velocityMode;
+
     private double output = 0;
 
     private double tolerance;
@@ -29,11 +32,28 @@ public class PIDFController {
 
     private ElapsedTime time = new ElapsedTime();
 
-    public PIDFController(double kP, double kI, double kD, double kF, double tolerance, double rampUpDist) {
+    public PIDFController(double kP, double kI, double kD, double kF, double tolerance, double rampUpDist, double kR) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         this.kF = kF;
+        this.kR = kR;
+        this.velocityMode = false;
+
+        this.rampDist = rampUpDist;
+
+        this.tolerance = tolerance;
+
+        enabled = true;
+    }
+
+    public PIDFController(double kP, double kI, double kD, double kF, double tolerance, double rampUpDist, double kR, boolean velMode) {
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.kF = kF;
+        this.kR = kR;
+        this.velocityMode = velMode;
 
         this.rampDist = rampUpDist;
 
@@ -51,22 +71,37 @@ public class PIDFController {
 
             if (!(setpoint - tolerance <= currentPosition && currentPosition <= setpoint + tolerance)) {
                 running = true;
+                double output;
 
                 double ramp = rampIGuess(currentPosition);
                 double pid = pidIGuess(currentPosition);
 
                 if (ramp == -9999999999999999999.123456789123456789123456789123456789123456789123456789123456789) {
-                    return pid;
+                    output = pid;
                 }  else if (pid > ramp) {
-                    return ramp;
+                    output = ramp;
                 } else {
-                    return pid;
+                    output = pid;
+                }
+
+                if (velocityMode && output == 0) {
+                    return 0;
+                } else {
+                    return output;
                 }
 
                 //return pid;
             } else {
                 running = false;
-                return 0;
+                //return kF;
+
+                if (velocityMode && setpoint == 0) {
+                    return 0;
+                } else if (velocityMode) {
+                    return kF;
+                } else {
+                    return 0;
+                }
             }
         } else {
             return 0;
@@ -110,7 +145,7 @@ public class PIDFController {
         double error = setpoint - currentPosition;
         integral = integral + error * dt;
         double derivative = (error - previous_error) / dt;
-        output = kP * error + kI * integral + kD * derivative;
+        output = (kP * error + kI * integral + kD * derivative) + kF;
         previous_error = error;
         lastTime = time.milliseconds();
 
@@ -123,7 +158,7 @@ public class PIDFController {
         if (distTraveled > rampDist) {
             return -9999999999999999999.123456789123456789123456789123456789123456789123456789123456789;
         } else {
-            return distTraveled/rampDist + kF;
+            return distTraveled/rampDist + kR;
         }
     }
 }

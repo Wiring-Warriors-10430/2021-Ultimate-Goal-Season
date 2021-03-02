@@ -92,11 +92,11 @@ public class Teleop extends OpMode {
         }
 
         if (gamepad2.left_bumper) {
-            robot.shooter.setVelocity(robot.desiredSpeed, AngleUnit.DEGREES);
+            robot.shooterVelocityController.setTarget(robot.desiredSpeed);
         } else if (gamepad2.back) {
-            robot.shooter.setVelocity(robot.autoDesiredSpeed, AngleUnit.DEGREES);
+            robot.shooterVelocityController.setTarget(robot.autoDesiredSpeed);
         } else {
-            robot.shooter.setVelocity(0);
+            robot.shooterVelocityController.setTarget(0);
         }
 
         if (gamepad1.left_bumper) {
@@ -217,6 +217,7 @@ public class Teleop extends OpMode {
         robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
         robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
         robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
+        robot.shooter.setPower(robot.shooterVelocityController.run(robot.shooter.getVelocity()));
 
         //robot.odometry.writePoseToFile();
     }

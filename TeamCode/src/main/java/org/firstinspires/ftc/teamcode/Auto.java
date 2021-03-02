@@ -70,8 +70,6 @@ public class Auto extends LinearOpMode {
     double singleRing = sounderHeight - 20;
     double fourRing = sounderHeight - 80;
 
-    double wheel = 0;
-
     WobbleDepot wobbleDepot;
 
     static double pushRingDelay = 500;
@@ -92,6 +90,8 @@ public class Auto extends LinearOpMode {
 
         robot.indexer.setPosition(robot.indexerLowest);
 
+        robot.drivetrain.setVoltage(robot.voltageSensor.getVoltage());
+
         /** WAIT FOR START */
         waitForStart();
 
@@ -109,10 +109,10 @@ public class Auto extends LinearOpMode {
         goToGoal(400, 600, Math.toRadians(90));
 
         // Get to stack
-        goToGoal(520, 1145, Math.toRadians(0));
+        goToGoal(500, 1145, Math.toRadians(0));
 
         // Measure Stack
-        goodWait(500);
+        goodWait(1000);
 
         // Move Wobble arm to score
         robot.wobbleArmController.setTarget(90);
@@ -153,11 +153,11 @@ public class Auto extends LinearOpMode {
         goToDepot(wobbleDepot);
 
         // prep Shooter
-        wheel = robot.autoDesiredSpeed; //TODO: tune
+        robot.shooterVelocityController.setTarget(robot.autoDesiredSpeed); //TODO: tune
         robot.shooterLiftController.setTarget(robot.autoShooterAngle); //TODO: tune
 
         // Move to shooting pos
-        goToGoal(1450, 1500, Math.toRadians(17));
+        goToGoal(1450, 1500, Math.toRadians(18));
 
         // Push ring
         robot.pusher.setPosition(0);
@@ -172,7 +172,7 @@ public class Auto extends LinearOpMode {
         robot.indexer.setPosition(robot.indexerMid);
 
         // Second powershot
-        goToGoal(1450, 1500, Math.toRadians(13));
+        goToGoal(1450, 1500, Math.toRadians(14));
 
         // Wait for indexer
         goodWait(moveIndexerDelay);
@@ -190,7 +190,7 @@ public class Auto extends LinearOpMode {
         robot.indexer.setPosition(robot.indexerHigh);
 
         // Third powershot
-        goToGoal(1450, 1500, Math.toRadians(9));
+        goToGoal(1450, 1500, Math.toRadians(10));
 
         // Wait for indexer
         goodWait(moveIndexerDelay);
@@ -205,7 +205,7 @@ public class Auto extends LinearOpMode {
         robot.pusher.setPosition(.22);
 
         // spin down
-        wheel = 0;
+        robot.shooterVelocityController.setTarget(0);
 
         // Wobble to grab
         robot.wobbleArmController.setTarget(90);
@@ -224,7 +224,7 @@ public class Auto extends LinearOpMode {
         //goToGoal(1327, 960, Math.toRadians(0));
 
         // Actually grab wobble TODO: tune
-        goToGoal(1350, 770, Math.toRadians(0));
+        goToGoal(1250, 750, Math.toRadians(0));
 
         goodWait(500);
 
@@ -250,7 +250,7 @@ public class Auto extends LinearOpMode {
 
         robot.wobbleArmController.setTarget(0);
 
-        goToGoal(600, 1650, Math.toRadians(180));
+        goToGoal(600, 1650, Math.toRadians(0));
 
         goodWait(2000);
 
@@ -262,9 +262,9 @@ public class Auto extends LinearOpMode {
         robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
         robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
 
-        robot.shooter.setVelocity(wheel, AngleUnit.DEGREES);
+        robot.shooter.setPower(robot.shooterVelocityController.run(robot.shooter.getVelocity()));
 
-        teleDump();
+        //teleDump();
     }
 
     public void waitForAuto() {
@@ -348,10 +348,10 @@ public class Auto extends LinearOpMode {
     private void goToDepotTwo(WobbleDepot depot) {
         if (depot == WobbleDepot.FRONT) {
             // go to depot one a seocnd time
-            goToGoal(550, 1600, Math.toRadians(180+90));
+            goToGoal(550, 1600, Math.toRadians(-90));
         } else if (depot == WobbleDepot.MIDDLE) {
             // go ot depot two a seocnd time
-            goToGoal(480, 2200, Math.toRadians(180-45));
+            goToGoal(480, 1800, Math.toRadians(180-45));
         } else if (depot == WobbleDepot.BACK) {
             // go to depot three a second time
             goToGoal(480, 3000, Math.toRadians(180+90));
@@ -361,6 +361,10 @@ public class Auto extends LinearOpMode {
     private void teleDump() {
         telemetry.addData("Shooter Speed :", robot.shooter.getVelocity());
         telemetry.addData("Measured Depot :", wobbleDepot);
+        telemetry.addData("Voltage", robot.drivetrain.getVoltage());
+        telemetry.addData("theta happy", !robot.drivetrain.thetaAt());
+        telemetry.addData("x happy", !robot.drivetrain.xAt());
+        telemetry.addData("y happy", !robot.drivetrain.yAt());
         telemetry.update();
     }
 }

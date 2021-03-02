@@ -11,15 +11,17 @@ public class MeccanumDrivetrain {
 
     private Odometry odometry;
 
-    private PIDFController xPID = new PIDFController(.011,0,.15,.2, 20, 50); //kD = .1
-    private PIDFController yPID = new PIDFController(.006,0,.15,.2, 20, 50); // kD = .1
-    private PIDFController thetaPID = new PIDFController(4.5,0,30,0, Math.toRadians(.5), Math.toRadians(.5)); // kP = 3.9
+    private PIDFController xPID = new PIDFController(.012,0,.2,0, 10, 50, .2); //kD = .1
+    private PIDFController yPID = new PIDFController(.007,0,.3,0, 10, 50, .2); // kD = .1
+    private PIDFController thetaPID = new PIDFController(3.3,0,0,0, Math.toRadians(.5), Math.toRadians(.5), 0); // kP = 3.9
 
     private double goalX = 0;
     private double goalY = 0;
     private double goalHeading = 0;
 
-    private double maxVoltage = 12.5;
+    private double maxVoltage = 13;
+
+    private double currentVoltage = 12.5;
 
     public MeccanumDrivetrain(DcMotorEx rearLeftDrive, DcMotorEx rearRightDrive, DcMotorEx frontLeftDrive, DcMotorEx frontRightDrive, Odometry odometry) {
           this.rearLeftDrive = rearLeftDrive;
@@ -79,6 +81,14 @@ public class MeccanumDrivetrain {
         double yOutput = yPID.run(odometry.getY());
         double headingOutput = -thetaPID.run(odometry.getHeadingTheta());
 
+        xOutput = MoreMath.clamp(xOutput, -1, 1);
+        yOutput = MoreMath.clamp(yOutput, -1, 1);
+        headingOutput = MoreMath.clamp(headingOutput, -1, 1);
+
+        xOutput = scalePower(xOutput);
+        yOutput = scalePower(yOutput);
+        headingOutput = scalePower(headingOutput);
+
         driveFieldCentered(xOutput, yOutput, headingOutput, odometry.getHeadingTheta());
     }
 
@@ -94,5 +104,29 @@ public class MeccanumDrivetrain {
 
     public boolean isRunning() {
         return xPID.isRunning() || yPID.isRunning() || thetaPID.isRunning();
+    }
+
+    public void setVoltage(double voltage) {
+        currentVoltage = voltage;
+    }
+
+    public double getVoltage() {
+        return currentVoltage;
+    }
+
+    private double scalePower(double desiredPower) {
+        return desiredPower * (maxVoltage/currentVoltage);
+    }
+
+    public boolean thetaAt() {
+        return thetaPID.isRunning();
+    }
+
+    public boolean xAt() {
+        return xPID.isRunning();
+    }
+
+    public boolean yAt() {
+        return yPID.isRunning();
     }
 }
