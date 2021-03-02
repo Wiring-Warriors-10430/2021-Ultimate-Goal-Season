@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
@@ -69,19 +70,27 @@ public class Auto extends LinearOpMode {
     double singleRing = sounderHeight - 20;
     double fourRing = sounderHeight - 80;
 
+    double wheel = 0;
+
     WobbleDepot wobbleDepot;
+
+    static double pushRingDelay = 500;
+    static double dropWobbleDelay = 500;
+    static double moveIndexerDelay = 800;
 
     @Override
     public void runOpMode() {
         /** INIT */
         robot.init(hardwareMap);
 
+        robot.intakeFloor.setPosition(.52);
+
         robot.odometry.setOffset((140 + 225), 225-190, Math.toRadians(90));
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        robot.indexer.setPosition(.8);
+        robot.indexer.setPosition(robot.indexerLowest);
 
         /** WAIT FOR START */
         waitForStart();
@@ -96,18 +105,24 @@ public class Auto extends LinearOpMode {
 
         robot.sounderArm.setPosition(.8);
 
+        // Get off wall
         goToGoal(400, 600, Math.toRadians(90));
 
-        goToGoal(480, 1135, Math.toRadians(0));
+        // Get to stack
+        goToGoal(520, 1145, Math.toRadians(0));
 
-        goodWait(1000);
+        // Measure Stack
+        goodWait(500);
 
-        robot.wobbleArmController.setTarget(90); //TODO: tune
+        // Move Wobble arm to score
+        robot.wobbleArmController.setTarget(90);
 
+        // Calculate Stack
         double dist = robot.sounder.getDistance(DistanceUnit.MM);
 
         double numrings = (sounderHeight - dist)/20;
 
+        // Deside Depot
         if (numrings < 1 - distTol) {
             telemetry.addData("No Rings", dist);
             telemetry.addData("", numrings);
@@ -128,83 +143,116 @@ public class Auto extends LinearOpMode {
             wobbleDepot = WobbleDepot.BACK;
         }
 
+        // Sounder in
         robot.sounderArm.setPosition(.2);
 
-        robot.indexer.setPosition(.39); //TODO: tune
+        // Indexer bottom
+        robot.indexer.setPosition(robot.indexerLow);
 
+        // Go to depot
         goToDepot(wobbleDepot);
 
-        robot.shooter.setVelocity(robot.desiredSpeed); //TODO: tune
-        robot.shooterLiftController.setTarget(robot.shooterAngle); //TODO: tune
+        // prep Shooter
+        wheel = robot.autoDesiredSpeed; //TODO: tune
+        robot.shooterLiftController.setTarget(robot.autoShooterAngle); //TODO: tune
 
-        /**goToGoal(1280, 1000, Math.toRadians(15));
+        // Move to shooting pos
+        goToGoal(1450, 1500, Math.toRadians(17));
 
+        // Push ring
         robot.pusher.setPosition(0);
 
-        goodWait(100);
+        // Wait for pusher
+        goodWait(pushRingDelay);
 
+        // pusher in
         robot.pusher.setPosition(.22);
 
-        robot.indexer.setPosition(.31); //TODO: tune
+        // Indexer for second ring
+        robot.indexer.setPosition(robot.indexerMid);
 
-        //goodWait(100);
+        // Second powershot
+        goToGoal(1450, 1500, Math.toRadians(13));
 
-        goToGoal(1450, 1000, Math.toRadians(15));
+        // Wait for indexer
+        goodWait(moveIndexerDelay);
 
-        goodWait(300); //MARK < Search to change indexer move times
-
+        // push Ring
         robot.pusher.setPosition(0);
 
-        goodWait(100);
+        //Wait for pusher
+        goodWait(pushRingDelay);
 
+        // Pusher in
         robot.pusher.setPosition(.21);
 
-        robot.indexer.setPosition(.23); //TODO: tune
+        // Indexer for 3rd ring
+        robot.indexer.setPosition(robot.indexerHigh);
 
-        //goodWait(100);
+        // Third powershot
+        goToGoal(1450, 1500, Math.toRadians(9));
 
-        goToGoal(1610, 1000, Math.toRadians(15));
+        // Wait for indexer
+        goodWait(moveIndexerDelay);
 
-        goodWait(300); //MARK
-
+        // push ring
         robot.pusher.setPosition(0);
 
-        goodWait(100);
+        // wait for pusher
+        goodWait(pushRingDelay);
 
+        // pusher in
         robot.pusher.setPosition(.22);
 
-        //goodWait(100);
+        // spin down
+        wheel = 0;
 
-        robot.shooter.setVelocity(0);
+        // Wobble to grab
+        robot.wobbleArmController.setTarget(90);
 
+        // Reset Indexer
         robot.indexer.setPosition(.8);
 
+        // Shooter down
         robot.shooterLiftController.setTarget(0);
 
+        // grab wobble
         robot.wobbleLeft.setPower(1);
         robot.wobbleRight.setPower(1);
 
-        goToGoal(1327, 960, Math.toRadians(0)); //TODO: tune
-        goToGoal(1327, 773, Math.toRadians(0));
+        // Grab wobble move TODO: tune
+        //goToGoal(1327, 960, Math.toRadians(0));
 
+        // Actually grab wobble TODO: tune
+        goToGoal(1350, 770, Math.toRadians(0));
+
+        goodWait(500);
+
+        // Hold wobble
         robot.wobbleLeft.setPower(0);
         robot.wobbleRight.setPower(0);
+        robot.wobbleArmController.setTarget(50);
 
-        goToGoal(480, 900, Math.toRadians(180));
+        //goToGoal(480, 900, Math.toRadians(180));
 
+        // score second wobble
         goToDepotTwo(wobbleDepot);
 
+        // drop wobble
         robot.wobbleLeft.setPower(-1);
         robot.wobbleRight.setPower(-1);
 
-        goodWait(250); */
+        // wait for wobble
+        goodWait(dropWobbleDelay);
 
         robot.wobbleLeft.setPower(0);
         robot.wobbleRight.setPower(0);
 
-        goodWait(4000);
+        robot.wobbleArmController.setTarget(0);
 
-        //goToGoal(600, 2000, Math.toRadians(180));
+        goToGoal(600, 1650, Math.toRadians(180));
+
+        goodWait(2000);
 
         robot.odometry.writePoseToFile();
     }
@@ -213,6 +261,8 @@ public class Auto extends LinearOpMode {
         robot.shooterLift.setPower(robot.shooterLiftController.run(robot.shooterLiftEnc.getDistance()));
         robot.wobbleLift.setPower(robot.wobbleLiftController.run(robot.wobbleLiftEnc.getDistance()));
         robot.wobbleArm.setPower(robot.wobbleArmController.run(robot.wobbleArmEnc.getDistance()));
+
+        robot.shooter.setVelocity(wheel, AngleUnit.DEGREES);
 
         teleDump();
     }
@@ -226,7 +276,7 @@ public class Auto extends LinearOpMode {
 
             if ((robot.drivetrain.isRunning())) {
                 timer.reset();
-            } else if (timer.milliseconds() > 750) {
+            } else if (timer.milliseconds() > 1500) {
                 timeout = true;
             }
             myIdle();
@@ -254,44 +304,63 @@ public class Auto extends LinearOpMode {
 
     private void goToDepot(WobbleDepot depot) {
         if (depot == WobbleDepot.FRONT) {
-            goToGoal(480, 2280, Math.toRadians(-45));
+            // Go to depot one
+            goToGoal(480, 1700, Math.toRadians(180+45));
+
+            // drop wobble
             robot.wobbleLeft.setPower(-1);
             robot.wobbleRight.setPower(-1);
-            goodWait(250);
+
+            // wait for wobble drop
+            goodWait(dropWobbleDelay);
+
+            // stow wobble arm
             robot.wobbleArmController.setTarget(0);
-            goToGoal(560, 2400, Math.toRadians(-180));
-            goToGoal(700, 1900, Math.toRadians(-180));
         } else if (depot == WobbleDepot.MIDDLE) {
-            goToGoal(480, 2900, Math.toRadians(45));
+            // Go to depot two
+            goToGoal(480, 2320, Math.toRadians(180-45));
+
+            // drop wobble
             robot.wobbleLeft.setPower(-1);
             robot.wobbleRight.setPower(-1);
-            goodWait(250);
+
+            // wait for wobble
+            goodWait(dropWobbleDelay);
+
+            // stow wobble arm
             robot.wobbleArmController.setTarget(0);
-            goToGoal(480, 2900, Math.toRadians(180));
-            goToGoal(400, 1900, Math.toRadians(180));
         } else if (depot == WobbleDepot.BACK) {
-            goToGoal(400, 3100, Math.toRadians(-90));
+            // Go to depot three
+            goToGoal(480, 3100, Math.toRadians(180+90));
+
+            // drop wobble
             robot.wobbleLeft.setPower(-1);
             robot.wobbleRight.setPower(-1);
-            goodWait(250);
+
+            // wait for wobble to drop
+            goodWait(dropWobbleDelay);
+
+            // stow wobble arm
             robot.wobbleArmController.setTarget(0);
-            goToGoal(700, 1900, Math.toRadians(-180));
         }
     }
 
     private void goToDepotTwo(WobbleDepot depot) {
         if (depot == WobbleDepot.FRONT) {
-            goToGoal(480, 1750, Math.toRadians(180+45));
+            // go to depot one a seocnd time
+            goToGoal(550, 1600, Math.toRadians(180+90));
         } else if (depot == WobbleDepot.MIDDLE) {
-            goToGoal(480, 2320, Math.toRadians(180-45));
+            // go ot depot two a seocnd time
+            goToGoal(480, 2200, Math.toRadians(180-45));
         } else if (depot == WobbleDepot.BACK) {
-            goToGoal(480, 3100, Math.toRadians(180+90));
+            // go to depot three a second time
+            goToGoal(480, 3000, Math.toRadians(180+90));
         }
     }
 
     private void teleDump() {
         telemetry.addData("Shooter Speed :", robot.shooter.getVelocity());
-        telemetry.addData("Ring maybe :", wobbleDepot);
+        telemetry.addData("Measured Depot :", wobbleDepot);
         telemetry.update();
     }
 }

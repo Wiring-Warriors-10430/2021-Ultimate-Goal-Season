@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.lib.Joystick;
 import org.firstinspires.ftc.teamcode.lib.MoreMath;
 import org.firstinspires.ftc.teamcode.lib.Pose2D;
 
-@TeleOp(name="Odometry Test", group="Odometry")
+@TeleOp(name="Teleleleleleleop", group="Odometry")
 public class Teleop extends OpMode {
     Hardware robot = new Hardware();
 
@@ -23,6 +23,9 @@ public class Teleop extends OpMode {
 
     boolean shooterDown = true;
     boolean debounce = false;
+
+    boolean autoShooterDown = true;
+    boolean autoDebounce = false;
 
     boolean debounce2 = false;
     enum floorPos {
@@ -49,7 +52,7 @@ public class Teleop extends OpMode {
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
 
-        robot.drivetrain.setGoal(0, 1000, Math.toRadians(0));
+        robot.drivetrain.setGoal(1828, 3048, Math.toRadians(Math.toRadians(15)));
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
@@ -74,8 +77,6 @@ public class Teleop extends OpMode {
      */
     @Override
     public void loop() {
-        robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
-                rightStick.getX(1));
 
         if (gamepad1.left_trigger > 0) {
             double wobblePower = gamepad1.left_trigger;
@@ -92,11 +93,14 @@ public class Teleop extends OpMode {
 
         if (gamepad2.left_bumper) {
             robot.shooter.setVelocity(robot.desiredSpeed, AngleUnit.DEGREES);
+        } else if (gamepad2.back) {
+            robot.shooter.setVelocity(robot.autoDesiredSpeed, AngleUnit.DEGREES);
         } else {
             robot.shooter.setVelocity(0);
         }
 
         if (gamepad1.left_bumper) {
+            robot.intakeFloor.setPosition(.48);
             robot.intake.setPower(1.0);
             if (setPos == floorPos.INTAKE) {
                 robot.feeder.setPower(1.0);
@@ -104,9 +108,11 @@ public class Teleop extends OpMode {
                 robot.feeder.setPower(-.1);
             }
         } else if (gamepad1.right_bumper) {
+            robot.intakeFloor.setPosition(.48);
             robot.intake.setPower(-1.0);
             robot.feeder.setPower(-1.0);
         } else {
+            robot.intakeFloor.setPosition(.52);
             robot.intake.setPower(-.1);
             robot.feeder.setPower(-.1);
         }
@@ -146,13 +152,13 @@ public class Teleop extends OpMode {
             debounce2 = true;
             if (setPos == floorPos.INTAKE) {
                 setPos = floorPos.BOTTOM;
-                robot.indexer.setPosition(0.39d);
+                robot.indexer.setPosition(robot.indexerLow);
             } else if (setPos == floorPos.BOTTOM) {
                 setPos = floorPos.MID;
-                robot.indexer.setPosition(0.31d);
+                robot.indexer.setPosition(robot.indexerMid);
             } else if (setPos == floorPos.MID) {
                 setPos = floorPos.TOP;
-                robot.indexer.setPosition(0.23d);
+                robot.indexer.setPosition(robot.indexerHigh);
             }
         } else if (!gamepad2.y && debounce2) {
             debounce2 = false;
@@ -160,10 +166,10 @@ public class Teleop extends OpMode {
 
         if (gamepad2.a && robot.shooterLiftController.getTarget() <= 2) {
             setPos = floorPos.INTAKE;
-            robot.indexer.setPosition(.8);
+            robot.indexer.setPosition(robot.indexerLowest);
         }
 
-        if (gamepad2.b && robot.shooterAtSpeed()) {
+        if (gamepad2.b && (robot.shooterAtSpeed())) {
             robot.pusher.setPosition(0);
         } else {
             robot.pusher.setPosition(.22);
@@ -172,7 +178,7 @@ public class Teleop extends OpMode {
         if (gamepad2.x && !debounce) {
             shooterDown = !shooterDown;
             debounce = true;
-        } else if (!gamepad1.x && debounce) {
+        } else if (!gamepad2.x && debounce) {
             debounce = false;
         }
 
@@ -186,8 +192,22 @@ public class Teleop extends OpMode {
             }
         }
 
+        /**if (gamepad2.start && !autoDebounce) {
+            autoShooterDown = !autoShooterDown;
+            autoDebounce = true;
+        } else if (!gamepad2.start && autoDebounce) {
+            autoDebounce = false;
+        }*/
+
         if (robot.verbose) {
             verboseOutput();
+        }
+
+        if (gamepad1.a) {
+            robot.drivetrain.updateAutoDrive();
+        } else {
+            robot.drivetrain.drive(leftStick.getX(1), leftStick.getY(1),
+                    rightStick.getX(1));
         }
 
         //robot.wobbleLift.setPower(-gamepad1.right_stick_y);

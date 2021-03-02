@@ -20,8 +20,6 @@ import org.firstinspires.ftc.teamcode.lib.PIDFController;
 import java.io.File;
 
 public class Hardware {
-    public static final double shooterAngle = 26;
-
     public DcMotorEx rearLeftDrive;
     public DcMotorEx rearRightDrive;
     public DcMotorEx frontLeftDrive;
@@ -52,6 +50,7 @@ public class Hardware {
     public CRServo feeder;
     public Servo indexer;
     public Servo pusher;
+    public Servo intakeFloor;
     public CRServo wobbleLeft;
     public CRServo wobbleRight;
     public Servo sounderArm;
@@ -69,9 +68,22 @@ public class Hardware {
     public final static double wobbleArmToDeg = 360d / ((753.2d) * wobbleArmReduction);
 
     private double tol = 50;   // Set to the amount of ticks per second you are ok being off.
-    private double shooterRPM = 5185;   // TODO: Set to desired RPM of motor. //5035
+    private double shooterRPM = 3500;   // TODO: Set to desired RPM of motor. //5185
     private double shooterRPS = shooterRPM / 60;
     public double desiredSpeed = shooterRPS*28; // shooterRPS * 28
+
+    private double autoTol = 50;   // Set to the amount of ticks per second you are ok being off.
+    private double autoShooterRPM = 3400; //3000   // TODO: Set to desired RPM of motor. //5185
+    private double autoShooterRPS = autoShooterRPM / 60;
+    public double autoDesiredSpeed = autoShooterRPS*28; // shooterRPS * 28
+
+    public static final double shooterAngle = 33;
+    public static final double autoShooterAngle = 33;
+
+    public static final double indexerLowest = .8; //.8
+    public static final double indexerLow = .38; //.39
+    public static final double indexerMid = .29; //.31
+    public static final double indexerHigh = .2; //.23
 
     private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation.txt");
     private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset.txt");
@@ -205,16 +217,19 @@ public class Hardware {
         indexer = hwMap.get(Servo.class, "indexer");
         pusher = hwMap.get(Servo.class, "pusher");
         sounderArm = hwMap.get(Servo.class, "sounderArm");
+        intakeFloor = hwMap.get(Servo.class, "ramp servo");
 
         indexer.setDirection(Servo.Direction.FORWARD);
         pusher.setDirection(Servo.Direction.FORWARD);
         sounderArm.setDirection(Servo.Direction.FORWARD);
+        intakeFloor.setDirection(Servo.Direction.FORWARD);
 
         // .2 - .8 because linear servo, .2 - .6 because mechanics
         indexer.setPosition(.8);
         pusher.setPosition(.22);
         // .2 - .8 because linear servo
         sounderArm.setPosition(.2);
+        intakeFloor.setPosition(.52);
 
         /**
          *    Init Sensors
@@ -225,7 +240,15 @@ public class Hardware {
     }
 
     public boolean shooterAtSpeed() {
-        if (shooter.getVelocity() > desiredSpeed - tol) {
+        if ((shooter.getVelocity() > desiredSpeed - tol) && (shooter.getVelocity() < desiredSpeed + tol)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean autoShooterAtSpeed() {
+        if ((shooter.getVelocity() > autoDesiredSpeed - tol) && (shooter.getVelocity() < autoDesiredSpeed + tol)) {
             return true;
         } else {
             return false;
