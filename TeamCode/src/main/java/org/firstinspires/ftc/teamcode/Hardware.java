@@ -67,7 +67,7 @@ public class Hardware {
 
     public final static double odometerToMM = (1 / 8192d) * (38d * Math.PI);
 
-    public final static double shooterLiftToDeg = (360d/(2786d*2));
+    public final static double shooterLiftToDeg = (360d/(8192d));
     public final static double wobbleLiftToMM = (1/383.6d) * (47.625d * Math.PI);
     public final static double wobbleArmReduction = 4.5;
     public final static double wobbleArmToDeg = 360d / ((753.2d) * wobbleArmReduction);
@@ -82,8 +82,8 @@ public class Hardware {
     private double autoShooterRPS = autoShooterRPM / 60;
     public double autoDesiredSpeed = autoShooterRPS*28; // shooterRPS * 28
 
-    public static final double shooterAngle = 35;
-    public static final double autoShooterAngle = 35;
+    public static final double shooterAngle = 25;
+    public static final double autoShooterAngle = 25;
 
     public static final double indexerLowest = .8; //.8
     public static final double indexerLow = .38; //.39
@@ -121,7 +121,7 @@ public class Hardware {
         wobbleLift = hwMap.get(DcMotorEx.class, "wobbleLift");
         wobbleArm = hwMap.get(DcMotorEx.class, "wobbleArm");
 
-        shooterLiftEnc = new Encoder(shooterLift, 8192, 1, shooterLiftToDeg,false);
+        shooterLiftEnc = new Encoder(shooterLift, 8192, 1, shooterLiftToDeg,true);
         wobbleArmEnc = new Encoder(wobbleArm, 8192, 1, wobbleArmToDeg,false);
         wobbleLiftEnc = new Encoder(wobbleLift, 8192, 1, wobbleLiftToMM,false);
 

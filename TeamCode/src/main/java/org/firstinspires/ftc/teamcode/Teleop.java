@@ -278,7 +278,7 @@ public class Teleop extends OpMode {
         telemetry.addLine();
         telemetry.addData("shooter power", robot.shooter.getPower());
         telemetry.addData("shooter degrees/time", robot.shooter.getVelocity());
-        telemetry.addData("shooter degrees/time", robot.shooter.getVelocity(AngleUnit.DEGREES) / (360) * 60);
+        telemetry.addData("shooter RPM", (robot.shooter.getVelocity()/28)*60);
         telemetry.addData("shooter port", robot.shooter.getPortNumber());
         telemetry.addLine();
         telemetry.addData("Wobble lift power", robot.wobbleLift.getPower());
