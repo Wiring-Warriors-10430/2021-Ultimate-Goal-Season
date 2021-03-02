@@ -1,6 +1,6 @@
 ## TeamCode
 
-This is where you will find all of our code. Below is an outline of each class in the root of this directory. For more information on our libraries, see [TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/readme.md](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/new/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/readme.md).
+This is where you will find all of our code. Below is an outline of each class in the root of this directory. For more information on our libraries, see [TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/readme.md](https://github.com/Wiring-Warriors-10430/2021-Ultimate-Goal-Season/blob/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/lib/readme.md).
 
 ## Outline
 
