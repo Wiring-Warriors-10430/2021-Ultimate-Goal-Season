@@ -139,7 +139,7 @@ public class Hardware {
         robotEncoderWheelDistance = Double.parseDouble(ReadWriteFile.readFile(wheelBaseSeparationFile).trim());
         this.horizontalEncoderTickPerDegreeOffset = Double.parseDouble(ReadWriteFile.readFile(horizontalTickOffsetFile).trim());
 
-        odometry = new Odometry(left, right, center, robotEncoderWheelDistance, horizontalEncoderTickPerDegreeOffset, 75);
+        odometry = new Odometry(left, right, center, robotEncoderWheelDistance, horizontalEncoderTickPerDegreeOffset, 50);
 
         odometry.startTracking();
 
@@ -239,7 +239,7 @@ public class Hardware {
         indexer.setPosition(.8);
         pusher.setPosition(.22);
         // .2 - .8 because linear servo
-        sounderArm.setPosition(.8);
+        sounderArm.setPosition(.2);
         intakeFloor.setPosition(.52);
 
         /**
