@@ -62,9 +62,9 @@ public class Auto extends LinearOpMode {
 
     Hardware robot = new Hardware();
 
-    double distTol = .1;
+    double distTol = .2;
 
-    double sounderHeight = 185;
+    double sounderHeight = 180;
 
     double noRing = sounderHeight - 0;
     double singleRing = sounderHeight - 20;
@@ -109,7 +109,7 @@ public class Auto extends LinearOpMode {
         goToGoal(400, 600, Math.toRadians(90));
 
         // Get to stack
-        goToGoal(500, 1145, Math.toRadians(0));
+        goToGoal(480, 1145, Math.toRadians(0));
 
         // Measure Stack
         goodWait(1000);
@@ -118,7 +118,7 @@ public class Auto extends LinearOpMode {
         robot.wobbleArmController.setTarget(90);
 
         // Calculate Stack
-        double dist = robot.sounder.getDistance(DistanceUnit.MM);
+        double dist = robot.highSounder.getDistance(DistanceUnit.MM);
 
         double numrings = (sounderHeight - dist)/20;
 

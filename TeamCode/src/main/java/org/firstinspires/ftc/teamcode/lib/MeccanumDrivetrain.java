@@ -13,7 +13,7 @@ public class MeccanumDrivetrain {
 
     private PIDFController xPID = new PIDFController(.012,0,.2,0, 10, 50, .2); //kD = .1
     private PIDFController yPID = new PIDFController(.007,0,.3,0, 10, 50, .2); // kD = .1
-    private PIDFController thetaPID = new PIDFController(3.3,0,0,0, Math.toRadians(.5), Math.toRadians(.5), 0); // kP = 3.9
+    private PIDFController thetaPID = new PIDFController(3.2,0,0,0, Math.toRadians(.5), Math.toRadians(.5), 0); // kP = 3.9
 
     private double goalX = 0;
     private double goalY = 0;

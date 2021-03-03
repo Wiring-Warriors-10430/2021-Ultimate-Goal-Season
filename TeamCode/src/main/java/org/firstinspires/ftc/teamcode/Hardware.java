@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -58,7 +59,8 @@ public class Hardware {
     public CRServo wobbleRight;
     public Servo sounderArm;
 
-    public DistanceSensor sounder;
+    public DistanceSensor highSounder;
+    public ColorRangeSensor lowSounder;
 
     public VoltageSensor voltageSensor;
 
@@ -78,12 +80,12 @@ public class Hardware {
     public double desiredSpeed = shooterRPS*28; // shooterRPS * 28
 
     private double autoTol = 50;   // Set to the amount of ticks per second you are ok being off.
-    private double autoShooterRPM = 3100; //3000   // TODO: Set to desired RPM of motor. //5185
+    private double autoShooterRPM = 3050; //3000   // TODO: Set to desired RPM of motor. //5185
     private double autoShooterRPS = autoShooterRPM / 60;
     public double autoDesiredSpeed = autoShooterRPS*28; // shooterRPS * 28
 
-    public static final double shooterAngle = 25;
-    public static final double autoShooterAngle = 25;
+    public static final double shooterAngle = 28.5;
+    public static final double autoShooterAngle = 28.5;
 
     public static final double indexerLowest = .8; //.8
     public static final double indexerLow = .38; //.39
@@ -195,7 +197,7 @@ public class Hardware {
 
         shooterVelocityController = new PIDFController(.01, 0, 0, .3, 10, 0, .3, true);
 
-        shooterLiftController = new PIDFController(.15, 0, 0, 0, .2, 0, 0);
+        shooterLiftController = new PIDFController(.04, 0, 0, 0, .2, 0, 0);
         wobbleLiftController = new PIDFController(.03, 0, 0, 0, 1, 0, 0);
         wobbleArmController = new PIDFController(.01, 0, 0, 0, 1, 0, 0);
 
@@ -237,7 +239,7 @@ public class Hardware {
         indexer.setPosition(.8);
         pusher.setPosition(.22);
         // .2 - .8 because linear servo
-        sounderArm.setPosition(.2);
+        sounderArm.setPosition(.8);
         intakeFloor.setPosition(.52);
 
         /**
@@ -245,7 +247,8 @@ public class Hardware {
          */
 
         // I2C Sensors
-        sounder = hwMap.get(DistanceSensor.class, "sounder");
+        lowSounder = hwMap.get(ColorRangeSensor.class, "low_sounder");
+        highSounder = hwMap.get(DistanceSensor.class, "high_sounder");
     }
 
     public boolean shooterAtSpeed() {

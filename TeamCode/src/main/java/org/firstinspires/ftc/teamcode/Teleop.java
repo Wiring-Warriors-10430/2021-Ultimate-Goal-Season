@@ -317,7 +317,8 @@ public class Teleop extends OpMode {
 
         // Send Sensor info
         telemetry.addLine("Sensors:");
-        telemetry.addData("sounder distance mm", robot.sounder.getDistance(DistanceUnit.MM));
+        telemetry.addData("high sounder distance mm", robot.highSounder.getDistance(DistanceUnit.MM));
+        telemetry.addData("low sounder distance mm", robot.lowSounder.getDistance(DistanceUnit.MM));
         telemetry.addLine("");
         telemetry.addLine();
     }
