@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.lib.Joystick;
 import org.firstinspires.ftc.teamcode.lib.MoreMath;
 import org.firstinspires.ftc.teamcode.lib.Pose2D;
 
-@TeleOp(name="Teleleleleleleop", group="Odometry")
+@TeleOp(name="Teleleleleleleop", group="_Robot")
 public class Teleop extends OpMode {
     Hardware robot = new Hardware();
 
