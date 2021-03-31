@@ -74,7 +74,7 @@ public class Hardware {
     public Servo sounderArm;
 
     public DistanceSensor highSounder;
-    public ColorRangeSensor lowSounder;
+    public DistanceSensor lowSounder;
 
     public NavxMicroNavigationSensor navxMicro;
 
@@ -278,7 +278,7 @@ public class Hardware {
          */
 
         // I2C Sensors
-        lowSounder = hwMap.get(ColorRangeSensor.class, "low_sounder");
+        lowSounder = hwMap.get(DistanceSensor.class, "low_sounder");
         highSounder = hwMap.get(DistanceSensor.class, "high_sounder");
 
         // Vision System
