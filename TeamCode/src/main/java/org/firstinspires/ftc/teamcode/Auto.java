@@ -282,6 +282,7 @@ public class Auto extends LinearOpMode {
                 timeout = true;
             }
             myIdle();
+            idle();
         } while (robot.drivetrain.isRunning() && opModeIsActive() && !timeout);
     }
 
@@ -297,6 +298,7 @@ public class Auto extends LinearOpMode {
 
         while (timer.milliseconds() < time && opModeIsActive()) {
             myIdle();
+            idle();
         }
     }
 
