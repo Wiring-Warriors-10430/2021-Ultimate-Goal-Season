@@ -10,11 +10,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.lib.Joystick;
 import org.firstinspires.ftc.teamcode.lib.MoreMath;
 import org.firstinspires.ftc.teamcode.lib.Pose2D;
 
-@TeleOp(name="Teleop2: Electric Boogaloo", group="__Robot2")
+import java.util.List;
+
+@TeleOp(name="Teleop2: Electric Boogaloo", group="aaRobot2")
 public class TeleopElectricBoogaloo extends OpMode {
     HardwareElectricBoogaloo robot = new HardwareElectricBoogaloo();
 
@@ -43,18 +46,22 @@ public class TeleopElectricBoogaloo extends OpMode {
 
         robot.drivetrain.setGoal(1828, 3048, Math.toRadians(Math.toRadians(15)));
 
+        robot.tfod.activate();
+
+        // The TensorFlow software will scale the input images from the camera to a lower resolution.
+        // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+        // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
+        // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+        // should be set to the value of the images used to create the TensorFlow Object Detection model
+        // (typically 16/9).
+        robot.tfod.setZoom(4, 16.0/9.0);
+
         // The gyro automatically starts calibrating. This takes a few seconds.
         telemetry.log().add("Gyro Calibrating. Do Not Move!");
 
         // Wait until the gyro calibration is complete
         timer.reset();
-        while (robot.navxMicro.isCalibrating())  {
-            telemetry.addData("calibrating", "%s", Math.round(timer.seconds())%2==0 ? "|.." : "..|");
-            telemetry.update();
-            goodWait(50);
-        }
-        telemetry.log().clear(); telemetry.log().add("Gyro Calibrated. Press Start.");
-        telemetry.clear(); telemetry.update();
+        timer.startTime();
     }
 
     /*
@@ -62,6 +69,15 @@ public class TeleopElectricBoogaloo extends OpMode {
      */
     @Override
     public void init_loop() {
+        if (robot.navxMicro.isCalibrating()) {
+            telemetry.addData("calibrating", "%s", Math.round(timer.seconds())%2==0 ? "|.." : "..|");
+            telemetry.update();
+        } else {
+            telemetry.log().clear();
+            telemetry.log().add("Gyro Calibrated. Press Start.");
+            telemetry.clear();
+            telemetry.update();
+        }
     }
 
     /*
@@ -69,6 +85,7 @@ public class TeleopElectricBoogaloo extends OpMode {
      */
     @Override
     public void start() {
+        telemetry.log().clear();
     }
 
     /*
@@ -86,6 +103,7 @@ public class TeleopElectricBoogaloo extends OpMode {
         }
 
         if (robot.verbose) {
+            visionTest();
             verboseOutput();
         }
 
@@ -112,6 +130,27 @@ public class TeleopElectricBoogaloo extends OpMode {
         timer.reset();
 
         while (timer.milliseconds() < time) {}
+    }
+
+    private void visionTest() {
+        if (robot.tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                // step through the list of recognitions and display boundary info.
+                int i = 0;
+                for (Recognition recognition : updatedRecognitions) {
+                    telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                    telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                            recognition.getLeft(), recognition.getTop());
+                    telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                            recognition.getRight(), recognition.getBottom());
+                }
+                //telemetry.update();
+            }
+        }
     }
 
     private void verboseOutput() {

@@ -1,22 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.lib.Encoder;
 import org.firstinspires.ftc.teamcode.lib.MeccanumDrivetrain;
 import org.firstinspires.ftc.teamcode.lib.Odometry;
-import org.firstinspires.ftc.teamcode.lib.PIDFController;
 
 import java.io.File;
 
@@ -45,8 +46,17 @@ public class HardwareElectricBoogaloo {
 
     public final static double odometerToMM = (1 / 8192d) * (38d * Math.PI);
 
-    private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation.txt");
-    private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset.txt");
+    private File wheelBaseSeparationFile = AppUtil.getInstance().getSettingsFile("wheelBaseSeparation2.txt");
+    private File horizontalTickOffsetFile = AppUtil.getInstance().getSettingsFile("horizontalTickOffset2.txt");
+    private File vuforiaKey = AppUtil.getInstance().getSettingsFile("vuforiaKey.txt");
+
+    public static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    public static final String LABEL_FIRST_ELEMENT = "Quad";
+    public static final String LABEL_SECOND_ELEMENT = "Single";
+    public static String VUFORIA_KEY;
+
+    public VuforiaLocalizer vuforia;
+    public TFObjectDetector tfod;
 
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
@@ -60,6 +70,9 @@ public class HardwareElectricBoogaloo {
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
+
+        VUFORIA_KEY = ReadWriteFile.readFile(vuforiaKey).trim();
+
 
 
         /**
@@ -105,8 +118,8 @@ public class HardwareElectricBoogaloo {
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        rearLeftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        rearRightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rearRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -156,6 +169,10 @@ public class HardwareElectricBoogaloo {
         navxMicro = hwMap.get(NavxMicroNavigationSensor.class, "navx");
 
 
+        // Vision System
+        initVuforia();
+        initTfod();
+
     }
 
 
@@ -169,5 +186,35 @@ public class HardwareElectricBoogaloo {
 
     String formatDegrees(double degrees){
         return String.format("%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
+
+    /**
+     * Initialize the Vuforia localization engine.
+     */
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hwMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hwMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hwMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.8f;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 }

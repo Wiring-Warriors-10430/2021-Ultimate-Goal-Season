@@ -84,7 +84,7 @@ public class PIDFController {
                     output = pid;
                 }
 
-                if (velocityMode && output == 0) {
+                if (velocityMode && setpoint == 0) {
                     return 0;
                 } else {
                     return output;

@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.lib;
 
+import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 public class OdometryGlobalTracking implements Runnable {
     // mm
     private double odometerTrackWidth = 0;
@@ -12,6 +18,8 @@ public class OdometryGlobalTracking implements Runnable {
     private double headingOffset = 0;
 
     private Encoder left, right, center;
+
+    private IntegratingGyroscope gyro;
 
     private boolean isRunning = true;
 
@@ -28,6 +36,17 @@ public class OdometryGlobalTracking implements Runnable {
         sleepTime = updateTime;
     }
 
+    public OdometryGlobalTracking(Encoder left, Encoder right, Encoder center, IntegratingGyroscope gyro, double normalOffset, double odometerTrackWidth, int updateTime) {
+        this.left = left;
+        this.right = right;
+        this.center = center;
+        this.gyro = gyro;
+        this.normalOffset = normalOffset;
+        this.odometerTrackWidth = odometerTrackWidth;
+
+        sleepTime = updateTime;
+    }
+
     public void positionUpdate() {
         double newLeft = left.getDistance(), newRight = right.getDistance(), newCenter = center.getDistance();
 
@@ -35,8 +54,14 @@ public class OdometryGlobalTracking implements Runnable {
         double deltaRight = newRight - rightOdometer;
         double deltaCenter = newCenter - centerOdometer;
 
-        double deltaTheta = ( (deltaLeft - deltaRight) / (odometerTrackWidth) );
-        robotTheta += (deltaTheta);
+        double deltaTheta;
+
+        if (gyro == null) {
+            deltaTheta = ( (deltaLeft - deltaRight) / (odometerTrackWidth) );
+            robotTheta += (deltaTheta);
+        } else {
+            deltaTheta = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+        }
 
         double localDeltaX = deltaCenter - (deltaTheta * normalOffset);
 
