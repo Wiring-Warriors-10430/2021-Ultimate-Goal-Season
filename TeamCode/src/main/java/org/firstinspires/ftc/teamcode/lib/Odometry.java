@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.lib;
 
+import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
@@ -12,6 +13,7 @@ public class Odometry {
     private Encoder left;
     private Encoder right;
     private Encoder normal;
+    private IntegratingGyroscope gyro;
 
     private double trackWidth;
     private double normalOffset;
@@ -33,7 +35,23 @@ public class Odometry {
         this.trackWidth = trackWidth;
         this.normalOffset = normalOffset;
 
+
         tracking = new OdometryGlobalTracking(left, right, normal, normalOffset, trackWidth, updateTime);
+
+        //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
+        positionThread = new Thread(tracking);
+    }
+
+    public Odometry(Encoder left, Encoder right, Encoder normal, IntegratingGyroscope gyro, double trackWidth, double normalOffset, int updateTime) {
+        this.left = left;
+        this.right = right;
+        this.normal = normal;
+        this.trackWidth = trackWidth;
+        this.normalOffset = normalOffset;
+
+        this.gyro = gyro;
+
+        tracking = new OdometryGlobalTracking(left, right, normal, gyro, normalOffset, trackWidth, updateTime);
 
         //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
         positionThread = new Thread(tracking);
