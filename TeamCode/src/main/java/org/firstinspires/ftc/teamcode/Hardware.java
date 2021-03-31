@@ -141,6 +141,8 @@ public class Hardware {
         // Voltage Sensor
         voltageSensor = hwMap.get(VoltageSensor.class, "Control Hub");
 
+        navxMicro = hwMap.get(NavxMicroNavigationSensor.class, "navx");
+
         // DcMotors
         rearLeftDrive = hwMap.get(DcMotorEx.class, "rearLeftDrive");
         rearRightDrive = hwMap.get(DcMotorEx.class, "rearRightDrive");
@@ -278,7 +280,6 @@ public class Hardware {
         // I2C Sensors
         lowSounder = hwMap.get(ColorRangeSensor.class, "low_sounder");
         highSounder = hwMap.get(DistanceSensor.class, "high_sounder");
-        navxMicro = hwMap.get(NavxMicroNavigationSensor.class, "navx");
 
         // Vision System
         initVuforia();
