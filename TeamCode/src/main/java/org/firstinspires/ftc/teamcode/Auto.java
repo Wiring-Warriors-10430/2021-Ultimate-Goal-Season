@@ -254,7 +254,7 @@ public class Auto extends LinearOpMode {
 
         goToGoal(600, 1650, Math.toRadians(0));
 
-        goodWait(2000);
+        //goodWait(2000);
 
         robot.odometry.writePoseToFile();
     }

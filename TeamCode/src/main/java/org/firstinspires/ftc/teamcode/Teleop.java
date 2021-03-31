@@ -52,14 +52,17 @@ public class Teleop extends OpMode {
          */
         robot.init(hardwareMap);
 
-        //robot.odometry.setOffsetFromFile();
-
-        robot.odometry.setOffset(0, 0, Math.toRadians(0));
+        try {
+            robot.odometry.setOffsetFromFile();
+        } catch (Exception e) {
+            telemetry.addData("Exception thrown loading offset from file!", e);
+            robot.odometry.setOffset(0, 0, Math.toRadians(0));
+        }
 
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
 
-        robot.drivetrain.setGoal(1828, 3048, Math.toRadians(Math.toRadians(15)));
+        robot.drivetrain.setGoal(2000, 2000, Math.toRadians(Math.toRadians(0)));
 
         robot.tfod.activate();
 
@@ -88,9 +91,9 @@ public class Teleop extends OpMode {
             telemetry.addData("calibrating", "%s", Math.round(timer.seconds())%2==0 ? "|.." : "..|");
             telemetry.update();
         } else {
-            telemetry.log().clear();
+            //telemetry.log().clear();
             telemetry.log().add("Gyro Calibrated. Press Start.");
-            telemetry.clear();
+            //telemetry.clear();
             telemetry.update();
         }
     }
