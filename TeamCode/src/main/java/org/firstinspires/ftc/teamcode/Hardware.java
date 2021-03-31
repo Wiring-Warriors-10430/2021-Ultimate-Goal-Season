@@ -2,23 +2,19 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -30,7 +26,6 @@ import org.firstinspires.ftc.teamcode.lib.Encoder;
 import org.firstinspires.ftc.teamcode.lib.MeccanumDrivetrain;
 import org.firstinspires.ftc.teamcode.lib.Odometry;
 import org.firstinspires.ftc.teamcode.lib.PIDFController;
-import org.slf4j.helpers.MarkerIgnoringBase;
 
 import java.io.File;
 import java.util.List;
@@ -73,8 +68,8 @@ public class Hardware {
     public CRServo wobbleRight;
     public Servo sounderArm;
 
-    public DistanceSensor highSounder;
-    public DistanceSensor lowSounder;
+    //public DistanceSensor highSounder;
+    //public DistanceSensor lowSounder;
 
     public NavxMicroNavigationSensor navxMicro;
 
@@ -219,12 +214,9 @@ public class Hardware {
         frontRightDrive.setPower(0);
 
         shooterLift.setPower(0);
-        //shooter.setVelocity(0);
 
         wobbleArm.setPower(0);
         wobbleLift.setPower(0);
-
-        //shooter.setVelocityPIDFCoefficients(1.8, 0, 0, 0);
 
         shooterVelocityController = new PIDFController(.01, 0, 0, .3, 10, 0, .3, true);
 
@@ -234,6 +226,7 @@ public class Hardware {
 
         // Drivetrain class
         drivetrain = new MeccanumDrivetrain(rearLeftDrive, rearRightDrive,frontLeftDrive, frontRightDrive, odometry);
+
 
         /**
          *    Init Servos
@@ -273,13 +266,14 @@ public class Hardware {
         sounderArm.setPosition(.2);
         intakeFloor.setPosition(.52);
 
+
         /**
          *    Init Sensors
          */
 
         // I2C Sensors
-        lowSounder = hwMap.get(DistanceSensor.class, "low_sounder");
-        highSounder = hwMap.get(DistanceSensor.class, "high_sounder");
+        //lowSounder = hwMap.get(DistanceSensor.class, "low_sounder");
+        //highSounder = hwMap.get(DistanceSensor.class, "high_sounder");
 
         // Vision System
         initVuforia();
@@ -342,6 +336,16 @@ public class Hardware {
         tfodParameters.minResultConfidence = 0.8f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+
+        tfod.activate();
+
+        // The TensorFlow software will scale the input images from the camera to a lower resolution.
+        // This can result in lower detection accuracy at longer distances (> 55cm or 22").
+        // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
+        // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
+        // should be set to the value of the images used to create the TensorFlow Object Detection model
+        // (typically 16/9).
+        tfod.setZoom(4, 16.0/9.0);
     }
 
     public double getHeading() {
@@ -349,28 +353,28 @@ public class Hardware {
         return AngleUnit.DEGREES.normalize(angles.firstAngle);
     }
 
-    public ringStack measureStack() {
+    public Depot measureStack() {
         if (tfod != null) {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-            if (updatedRecognitions != null) {
-                Recognition recognition = updatedRecognitions.get(0);
+            List<Recognition> recognitions = tfod.getRecognitions();
+            if (recognitions != null && recognitions.size() > 0) {
+                Recognition recognition = recognitions.get(0);
 
                 if (recognition.getLabel() == "Single") {
-                    return ringStack.ONE;
+                    return Depot.MIDDLE;
                 } else {
-                    return ringStack.FOUR;
+                    return Depot.BACK;
                 }
             } else {
-                return ringStack.ZERO;
+                return Depot.FRONT;
             }
         } else {
-            return ringStack.ZERO;
+            return Depot.FRONT;
         }
     }
 
-    public enum ringStack {
-        ZERO, ONE, FOUR
+    public enum Depot {
+        FRONT, MIDDLE, BACK
     }
 }

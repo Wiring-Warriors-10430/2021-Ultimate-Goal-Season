@@ -54,6 +54,7 @@ public class Teleop extends OpMode {
 
         try {
             robot.odometry.setOffsetFromFile();
+            robot.odometry.setOffset(228.6, 228.6, Math.toRadians(0));
         } catch (Exception e) {
             telemetry.addData("Exception thrown loading offset from file!", e);
             robot.odometry.setOffset(0, 0, Math.toRadians(0));
@@ -62,20 +63,10 @@ public class Teleop extends OpMode {
         leftStick = new Joystick(gamepad1, Joystick.Stick.LEFT, 2);
         rightStick = new Joystick(gamepad1, Joystick.Stick.RIGHT, 2);
 
-        robot.drivetrain.setGoal(2000, 2000, Math.toRadians(Math.toRadians(0)));
-
-        robot.tfod.activate();
-
-        // The TensorFlow software will scale the input images from the camera to a lower resolution.
-        // This can result in lower detection accuracy at longer distances (> 55cm or 22").
-        // If your target is at distance greater than 50 cm (20") you can adjust the magnification value
-        // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
-        // should be set to the value of the images used to create the TensorFlow Object Detection model
-        // (typically 16/9).
-        robot.tfod.setZoom(4, 16.0/9.0);
+        robot.drivetrain.setGoal(765, 1875, .05);
 
         // The gyro automatically starts calibrating. This takes a few seconds.
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        telemetry.addLine("Gyro Calibrating. Do Not Move!");
 
         // Wait until the gyro calibration is complete
         timer.reset();
@@ -91,9 +82,7 @@ public class Teleop extends OpMode {
             telemetry.addData("calibrating", "%s", Math.round(timer.seconds())%2==0 ? "|.." : "..|");
             telemetry.update();
         } else {
-            //telemetry.log().clear();
-            telemetry.log().add("Gyro Calibrated. Press Start.");
-            //telemetry.clear();
+            telemetry.addLine("Gyro Calibrated. Press Start.");
             telemetry.update();
         }
     }
@@ -102,7 +91,9 @@ public class Teleop extends OpMode {
      * Code to run ONCE when the driver hits PLAY
      */
     @Override
-    public void start() { telemetry.log().clear();}
+    public void start() {
+        telemetry.log().clear();
+    }
 
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -149,14 +140,6 @@ public class Teleop extends OpMode {
             robot.feeder.setPower(-.1);
         }
 
-        /**if (gamepad2.dpad_up) {
-            robot.wobbleLift.setPower(.8);
-        } else if (gamepad2.dpad_down) {
-            robot.wobbleLift.setPower(-.2);
-        } else {
-            robot.wobbleLift.setPower(0);
-        }*/
-
         if (gamepad2.dpad_up) {
             robot.wobbleLiftController.setTarget(300); //374.65
         } else if (gamepad2.dpad_down) {
@@ -168,17 +151,6 @@ public class Teleop extends OpMode {
         } else if (gamepad2.dpad_left) {
             robot.wobbleArmController.setTarget(0);
         }
-
-        /**if (gamepad2.y) {
-            setPos = MoreMath.clamp(setPos-moveAmount, .2, .8);
-            robot.indexer.setPosition(setPos);
-        } else if (gamepad2.a) {
-            setPos = MoreMath.clamp(setPos+moveAmount, .2, .8);
-            robot.indexer.setPosition(setPos);
-        } else {
-            setPos = MoreMath.clamp(setPos, .2, .8);
-            robot.indexer.setPosition(setPos);
-        }*/
 
         if (gamepad2.y && !debounce2) {
             debounce2 = true;
@@ -223,13 +195,6 @@ public class Teleop extends OpMode {
                 robot.indexer.setPosition(.38);
             }
         }
-
-        /**if (gamepad2.start && !autoDebounce) {
-            autoShooterDown = !autoShooterDown;
-            autoDebounce = true;
-        } else if (!gamepad2.start && autoDebounce) {
-            autoDebounce = false;
-        }*/
 
         if (robot.verbose) {
             verboseOutput();
@@ -279,7 +244,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Right", robot.right.getDistance());
         telemetry.addData("Center", robot.center.getDistance());
         telemetry.addData("Conversion", robot.odometerToMM);
-        telemetry.addLine("");
+        telemetry.addLine();
         telemetry.addLine();
 
         // Send Joystick Info
@@ -320,7 +285,7 @@ public class Teleop extends OpMode {
         telemetry.addData("Wobble arm power", robot.wobbleArm.getPower());
         telemetry.addData("Wobble arm port", robot.wobbleArm.getPortNumber());
         telemetry.addData("Wobble arm encoder", robot.wobbleArmEnc.getDistance());
-        telemetry.addLine("");
+        telemetry.addLine();
         telemetry.addLine();
 
         // Send Servo info
@@ -344,13 +309,11 @@ public class Teleop extends OpMode {
         telemetry.addLine();
         telemetry.addData("sounderArm position", robot.sounderArm.getPosition());
         telemetry.addData("sounderArm port", robot.sounderArm.getPortNumber());
-        telemetry.addLine("");
+        telemetry.addLine();
         telemetry.addLine();
 
         // Send Sensor info
         telemetry.addLine("Sensors:");
-        telemetry.addData("high sounder distance mm", robot.highSounder.getDistance(DistanceUnit.MM));
-        telemetry.addData("low sounder distance mm", robot.lowSounder.getDistance(DistanceUnit.MM));
         telemetry.addData("NavX Heading", robot.getHeading());
         telemetry.addLine();
         telemetry.addLine();
@@ -359,19 +322,18 @@ public class Teleop extends OpMode {
         if (robot.tfod != null) {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.
-            List<Recognition> updatedRecognitions = robot.tfod.getUpdatedRecognitions();
-            if (updatedRecognitions != null) {
-                telemetry.addData("# Object Detected", updatedRecognitions.size());
+            List<Recognition> recognitions = robot.tfod.getRecognitions();
+            if (recognitions != null) {
+                telemetry.addData("# Object Detected", recognitions.size());
                 // step through the list of recognitions and display boundary info.
                 int i = 0;
-                for (Recognition recognition : updatedRecognitions) {
+                for (Recognition recognition : recognitions) {
                     telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                     telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
                             recognition.getLeft(), recognition.getTop());
                     telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                             recognition.getRight(), recognition.getBottom());
                 }
-                //telemetry.update();
             }
         }
         telemetry.addData("Stack", robot.measureStack());

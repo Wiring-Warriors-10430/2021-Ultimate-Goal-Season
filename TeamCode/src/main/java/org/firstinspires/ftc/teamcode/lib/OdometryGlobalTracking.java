@@ -19,7 +19,7 @@ public class OdometryGlobalTracking implements Runnable {
 
     private Encoder left, right, center;
 
-    private IntegratingGyroscope gyro;
+    private IntegratingGyroscope gyro = null;
 
     private boolean isRunning = true;
 
@@ -60,7 +60,8 @@ public class OdometryGlobalTracking implements Runnable {
             deltaTheta = ( (deltaLeft - deltaRight) / (odometerTrackWidth) );
             robotTheta += (deltaTheta);
         } else {
-            deltaTheta = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+            deltaTheta = - (robotTheta + gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle);
+            robotTheta = - gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         }
 
         double localDeltaX = deltaCenter - (deltaTheta * normalOffset);
